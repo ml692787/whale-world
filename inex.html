@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Whale World!</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Fredoka+One&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{--gold:#ffd700;--teal:#23a6d5;--soft:#7ee8ff;--ui:rgba(2,18,44,0.93);--border:rgba(35,166,213,0.55);}
+html,body{width:100%;height:100%;overflow:hidden;background:#021222;font-family:'Fredoka One',cursive;touch-action:none;}
+canvas{position:fixed;inset:0;display:block;}
+.big-btn{padding:18px 52px;background:linear-gradient(135deg,var(--teal),#1560a0);border:3px solid var(--soft);border-radius:50px;color:#fff;font-family:'Bubblegum Sans',cursive;font-size:26px;cursor:pointer;box-shadow:0 0 30px rgba(35,166,213,.5);transition:all .2s;margin:6px;min-height:64px;}
+.big-btn:active{transform:scale(1.07);}
+
+/* TITLE */
+#title{position:fixed;inset:0;z-index:1000;background:linear-gradient(160deg,#0d2a4a 0%,#03224c 50%,#021222 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;}
+#title-canvas{position:absolute;inset:0;pointer-events:none;}
+.t-whale{font-size:clamp(60px,14vw,110px);margin-bottom:8px;animation:bobW 2s ease-in-out infinite;}
+@keyframes bobW{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+.t-title{font-family:'Bubblegum Sans',cursive;font-size:clamp(42px,9vw,76px);color:#fff;text-shadow:0 0 50px var(--teal),0 4px 20px rgba(0,0,0,.6);margin-bottom:10px;text-align:center;}
+.t-sub{font-family:'Bubblegum Sans',cursive;font-size:clamp(18px,4vw,26px);color:var(--soft);margin-bottom:36px;text-align:center;}
+
+/* DRESS-UP */
+#dress{position:fixed;inset:0;z-index:900;background:linear-gradient(160deg,#0d2a4a,#03224c 50%,#021222);display:none;flex-direction:column;align-items:center;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px 28px;}
+#dress.on{display:flex;}
+.d-title{font-family:'Bubblegum Sans',cursive;font-size:clamp(28px,6vw,46px);color:#fff;text-shadow:0 0 24px var(--teal);margin-bottom:4px;text-align:center;}
+.d-sub{font-family:'Bubblegum Sans',cursive;font-size:19px;color:var(--soft);margin-bottom:16px;text-align:center;}
+.d-layout{display:flex;gap:14px;width:100%;max-width:860px;align-items:flex-start;flex-wrap:wrap;justify-content:center;}
+.d-preview{background:rgba(0,0,30,.4);border:2px solid var(--border);border-radius:22px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:200px;}
+#dress-canvas{border-radius:14px;background:radial-gradient(ellipse at 50% 40%,#0a3a6a,#021222);display:block;}
+.d-wname{font-family:'Bubblegum Sans',cursive;font-size:19px;color:var(--soft);text-align:center;}
+.d-right{flex:1;min-width:260px;}
+.dtab-row{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+.dtab{padding:10px 18px;border-radius:28px;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.14);color:#fff;font-family:'Bubblegum Sans',cursive;font-size:17px;cursor:pointer;min-height:48px;transition:all .15s;}
+.dtab.on{background:rgba(35,166,213,.35);border-color:var(--soft);}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;}
+.ditem{background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.12);border-radius:16px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .18s;min-height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+.ditem:active{border-color:var(--soft);transform:scale(1.04);}
+.ditem.on{border-color:var(--gold);background:rgba(255,215,0,.12);}
+.ditem-e{font-size:38px;line-height:1;}
+.ditem-n{font-family:'Bubblegum Sans',cursive;font-size:14px;color:#fff;}
+.d-go{margin-top:18px;padding:18px 52px;background:linear-gradient(135deg,#2ecc71,#1a9a50);border:3px solid #7dffb3;border-radius:50px;color:#fff;font-family:'Bubblegum Sans',cursive;font-size:28px;cursor:pointer;transition:all .2s;min-height:68px;box-shadow:0 0 30px rgba(46,204,113,.4);}
+.d-go:active{transform:scale(1.06);}
+
+/* HUD */
+#hud{position:fixed;top:0;left:0;right:0;height:56px;z-index:600;display:none;align-items:center;justify-content:space-between;padding:0 14px;background:rgba(2,18,44,.85);border-bottom:2px solid var(--border);backdrop-filter:blur(8px);}
+#hud-name{font-family:'Bubblegum Sans',cursive;font-size:18px;color:var(--soft);}
+#hud-stars{font-family:'Bubblegum Sans',cursive;font-size:24px;color:var(--gold);text-shadow:0 0 10px rgba(255,215,0,.6);}
+#hud-hint{font-size:15px;color:rgba(255,255,255,.5);}
+
+/* QUEST HUD */
+#qhud{position:fixed;top:60px;left:12px;width:224px;z-index:600;background:var(--ui);border:2px solid var(--border);border-radius:16px;padding:12px 14px;display:none;}
+#qhud.on{display:block;}
+#qh-who{font-family:'Bubblegum Sans',cursive;font-size:14px;color:var(--gold);margin-bottom:2px;}
+#qh-text{font-size:18px;color:#fff;line-height:1.4;}
+#qh-wrap{margin-top:7px;background:rgba(255,255,255,.1);border-radius:20px;height:14px;overflow:hidden;}
+#qh-bar{height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));border-radius:20px;transition:width .4s;}
+#qh-cnt{font-size:17px;color:var(--soft);margin-top:4px;}
+
+/* CAVE BUTTON — always visible */
+#cave-btn{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:16px;z-index:600;width:76px;height:76px;border-radius:50%;background:rgba(2,18,44,.9);border:3px solid rgba(255,215,0,.75);font-size:34px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:transform .15s;}
+#cave-btn.on{display:flex;}
+#cave-btn:active{transform:scale(.88);}
+#cave-lbl{position:fixed;font-family:'Bubblegum Sans',cursive;font-size:11px;color:rgba(255,215,0,.85);text-align:center;bottom:calc(5px + env(safe-area-inset-bottom,0px));left:16px;width:76px;display:none;pointer-events:none;}
+#cave-lbl.on{display:block;}
+
+/* DIALOGUE */
+#dlg{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);width:min(680px,94vw);z-index:700;background:var(--ui);border:3px solid var(--border);border-radius:24px;padding:18px 20px;display:none;gap:14px;align-items:flex-start;box-shadow:0 0 40px rgba(35,166,213,.3);}
+#dlg.on{display:flex;}
+#dlg-av{font-size:62px;flex-shrink:0;animation:bobA 1.2s ease-in-out infinite;}
+@keyframes bobA{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
+#dlg-who{font-family:'Bubblegum Sans',cursive;font-size:17px;color:var(--gold);margin-bottom:5px;}
+#dlg-txt{font-size:23px;line-height:1.5;color:#fff;}
+#dlg-sub{font-size:17px;color:var(--soft);margin-top:6px;}
+#dlg-fact{display:none;margin-top:12px;padding:12px 14px;background:rgba(255,215,0,.1);border:2px solid rgba(255,215,0,.38);border-radius:14px;}
+#dlg-fact-ttl{font-family:'Bubblegum Sans',cursive;font-size:16px;color:var(--gold);margin-bottom:5px;}
+#dlg-fact-txt{font-size:20px;color:#fff;line-height:1.5;}
+.dbtn{margin-top:12px;padding:13px 30px;background:linear-gradient(135deg,var(--teal),#1560a0);border:2px solid var(--soft);border-radius:30px;color:#fff;font-family:'Bubblegum Sans',cursive;font-size:21px;cursor:pointer;min-height:54px;transition:all .15s;}
+.dbtn:active{transform:scale(1.05);}
+
+/* FACT POPUP */
+#fact{position:fixed;top:64px;left:50%;transform:translateX(-50%);z-index:650;background:rgba(2,18,44,.97);border:2px solid var(--gold);border-radius:20px;padding:16px 22px;max-width:min(380px,90vw);text-align:center;display:none;cursor:pointer;animation:factPop .4s cubic-bezier(.175,.885,.32,1.275);}
+#fact.on{display:block;}
+@keyframes factPop{from{transform:translateX(-50%) scale(.7);opacity:0;}to{transform:translateX(-50%) scale(1);opacity:1;}}
+#fact-ico{font-size:42px;display:block;margin-bottom:6px;}
+#fact-ttl{font-family:'Bubblegum Sans',cursive;font-size:17px;color:var(--gold);margin-bottom:5px;}
+#fact-txt{font-size:21px;color:#fff;line-height:1.5;}
+
+/* LEVEL UP */
+#lvlup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:900;text-align:center;pointer-events:none;display:none;}
+#lvlup.on{display:block;animation:lvlP .6s cubic-bezier(.175,.885,.32,1.275);}
+@keyframes lvlP{from{transform:translate(-50%,-50%) scale(0);opacity:0;}to{transform:translate(-50%,-50%) scale(1);opacity:1;}}
+#lvl-t{font-family:'Bubblegum Sans',cursive;font-size:58px;color:var(--gold);text-shadow:0 0 30px var(--gold);}
+#lvl-s{font-size:25px;color:#fff;margin-top:6px;}
+
+/* SPARKLE */
+.sp{position:fixed;pointer-events:none;z-index:1000;font-size:26px;animation:spA .8s ease-out forwards;}
+@keyframes spA{0%{transform:scale(0) rotate(0);opacity:1;}100%{transform:scale(1.5) rotate(220deg) translateY(-44px);opacity:0;}}
+
+/* TOUCH */
+#tc{position:fixed;inset:0;pointer-events:none;z-index:550;display:none;}
+#drag-ripple{position:absolute;width:76px;height:76px;border-radius:50%;border:3px solid rgba(126,232,255,.65);background:rgba(35,166,213,.12);pointer-events:none;transform:translate(-50%,-50%);display:none;transition:opacity .15s;}
+#tc-powers{position:absolute;bottom:calc(108px + env(safe-area-inset-bottom,0px));left:106px;display:flex;flex-direction:row;gap:8px;pointer-events:all;}
+.tpbtn{width:58px;height:58px;border-radius:16px;background:rgba(2,18,44,.85);border:2px solid rgba(255,255,255,.2);color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;transition:all .1s;box-shadow:0 3px 10px rgba(0,0,0,.3);}
+.tpbtn.active{border-color:var(--gold);background:rgba(255,215,0,.18);box-shadow:0 0 14px rgba(255,215,0,.5);}
+.tpbtn:active{transform:scale(.87);}
+
+/* CAVE SCREEN */
+#cave{position:fixed;inset:0;z-index:800;background:radial-gradient(ellipse at 45% 55%,#0d2a50 0%,#021222 75%);display:none;flex-direction:column;align-items:center;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px 36px;}
+#cave.on{display:flex;}
+.cave-hdr{font-family:'Bubblegum Sans',cursive;font-size:clamp(28px,6vw,40px);color:var(--soft);text-shadow:0 0 20px var(--teal);margin-top:8px;margin-bottom:2px;}
+.cave-stars{font-family:'Bubblegum Sans',cursive;font-size:23px;color:var(--gold);margin-bottom:16px;}
+.ctabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;justify-content:center;}
+.ctab{padding:10px 18px;border-radius:28px;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.14);color:#fff;font-family:'Bubblegum Sans',cursive;font-size:17px;cursor:pointer;min-height:50px;transition:all .15s;}
+.ctab.on{background:rgba(35,166,213,.35);border-color:var(--soft);}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;width:100%;max-width:700px;}
+.citem{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.12);border-radius:18px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .18s;min-height:110px;}
+.citem:active{border-color:var(--soft);transform:translateY(-2px);}
+.citem.owned{border-color:var(--gold);}
+.citem.equipped{border-color:#2ecc71;background:rgba(46,204,113,.1);}
+.ci-e{font-size:44px;display:block;margin-bottom:6px;}
+.ci-n{font-family:'Bubblegum Sans',cursive;font-size:17px;color:#fff;margin-bottom:3px;}
+.ci-c{font-size:15px;color:var(--gold);}
+.ci-d{font-size:13px;color:var(--soft);margin-top:3px;line-height:1.3;}
+.cave-back{margin-top:18px;padding:16px 44px;background:linear-gradient(135deg,#2ecc71,#1a9a50);border:3px solid #7dffb3;border-radius:44px;color:#fff;font-family:'Bubblegum Sans',cursive;font-size:24px;cursor:pointer;transition:all .2s;min-height:62px;}
+.cave-back:active{transform:scale(1.06);}
+</style>
+</head>
+<body>
+
+<!-- TITLE -->
+<div id="title">
+  <canvas id="title-canvas"></canvas>
+  <div class="t-whale">🐋</div>
+  <div class="t-title">Whale World!</div>
+  <div class="t-sub">Swim, make friends, and find stars!</div>
+  <button class="big-btn" onclick="goToDress()">▶ Play!</button>
+</div>
+
+<!-- DRESS-UP -->
+<div id="dress">
+  <div class="d-title">Make Your Whale!</div>
+  <div class="d-sub">Pick colors and hats, then swim!</div>
+  <div class="d-layout">
+    <div class="d-preview">
+      <canvas id="dress-canvas" width="200" height="140"></canvas>
+      <div class="d-wname" id="d-wname">Blue Whale</div>
+    </div>
+    <div class="d-right">
+      <div class="dtab-row">
+        <button class="dtab on" onclick="setDTab('color')">🎨 Colors</button>
+        <button class="dtab"    onclick="setDTab('acc')">🎩 Hats</button>
+      </div>
+      <div class="dgrid" id="dgrid"></div>
+    </div>
+  </div>
+  <button class="d-go" onclick="startGame()">🌊 Let's Go!</button>
+</div>
+
+<!-- GAME CANVAS -->
+<canvas id="gc"></canvas>
+
+<!-- HUD -->
+<div id="hud">
+  <div id="hud-name">🐋 Blue Whale</div>
+  <div id="hud-hint"></div>
+  <div id="hud-stars">⭐ 0</div>
+</div>
+
+<!-- Quest HUD -->
+<div id="qhud">
+  <div id="qh-who">Quest!</div>
+  <div id="qh-text"></div>
+  <div id="qh-wrap"><div id="qh-bar" style="width:0%"></div></div>
+  <div id="qh-cnt"></div>
+</div>
+
+<!-- Cave button — always visible -->
+<button id="cave-btn" onclick="openCave()">🏠</button>
+<div id="cave-lbl">My Cave</div>
+
+<!-- Touch controls -->
+<div id="tc">
+  <div id="drag-ripple"></div>
+  <div id="tc-powers"></div>
+</div>
+
+<!-- Dialogue -->
+<div id="dlg">
+  <div id="dlg-av">🐢</div>
+  <div style="flex:1">
+    <div id="dlg-who"></div>
+    <div id="dlg-txt"></div>
+    <div id="dlg-sub"></div>
+    <div id="dlg-fact">
+      <div id="dlg-fact-ttl">🐋 Did You Know?</div>
+      <div id="dlg-fact-txt"></div>
+    </div>
+    <button class="dbtn" id="dlg-ok" onclick="closeDlg()">OK! 👍</button>
+    <button class="dbtn" id="dlg-acc" onclick="acceptQuest()" style="display:none">Yes! I'll help! 🌟</button>
+  </div>
+</div>
+
+<!-- Fact popup -->
+<div id="fact" onclick="dismissFact()">
+  <span id="fact-ico"></span>
+  <div id="fact-ttl">Did You Know?</div>
+  <div id="fact-txt"></div>
+</div>
+
+<!-- Level up -->
+<div id="lvlup"><div id="lvl-t"></div><div id="lvl-s"></div></div>
+
+<!-- Cave screen -->
+<div id="cave">
+  <div class="cave-hdr">🏠 Your Cave!</div>
+  <div class="cave-stars" id="cave-gold">⭐ 0 Stars</div>
+  <div class="ctabs">
+    <button class="ctab on"  onclick="setCTab('whale')">🐋 Whales</button>
+    <button class="ctab"     onclick="setCTab('color')">🎨 Colors</button>
+    <button class="ctab"     onclick="setCTab('acc')">🎩 Hats</button>
+    <button class="ctab"     onclick="setCTab('trail')">✨ Trails</button>
+    <button class="ctab"     onclick="setCTab('power')">⚡ Powers</button>
+  </div>
+  <div class="cgrid" id="cgrid"></div>
+  <button class="cave-back" onclick="closeCave()">🌊 Back to Swimming!</button>
+</div>
+
+<script>
+'use strict';
+
+// ════════════════ DATA ════════════════
+// Facts: short sentences, kindergarten level
+const FACTS=[
+  {e:'🐋',t:'Blue whales are the biggest animals EVER! Even bigger than dinosaurs!'},
+  {e:'🎵',t:'Humpback whales love to sing! Their songs can go on for hours!'},
+  {e:'💨',t:'Whales breathe air just like you! They come up to breathe through their blowhole!'},
+  {e:'🧠',t:'Orcas are very smart! They live with their family and talk to each other!'},
+  {e:'🦄',t:'Narwhals have a long horn! It is really a big tooth! So magical!'},
+  {e:'⚪',t:'Beluga whales are white and make lots of funny sounds!'},
+  {e:'🍤',t:'Blue whales eat millions of tiny shrimp every single day!'},
+  {e:'💤',t:'Whales sleep by floating! Half their brain stays awake so they can breathe!'},
+  {e:'👶',t:'Baby blue whales grow very, very fast! They drink lots of milk!'},
+  {e:'📏',t:'Blue whales are as long as three school buses! So big!'},
+  {e:'❤️',t:'A blue whale\'s heart is as big as a car!'},
+  {e:'🌊',t:'Some whales can hold their breath for a very long time underwater!'},
+  {e:'🌍',t:'Whales help keep the whole ocean healthy and happy!'},
+  {e:'🏋️',t:'A blue whale\'s tongue weighs as much as an elephant!'},
+  {e:'👪',t:'Whales live with their moms and dads, just like you!'},
+];
+
+const NPC_DEFS=[
+  {id:'terry', name:'Terry the Turtle', emoji:'🐢', color:'#2ecc71',
+   lines:['Hi there! The ocean is so fun today!','I love swimming! Do you?','You are my best friend!'],
+   qLines:['Oh no! I lost my shells! Can you find them?','Thank you SO much! You are amazing!']},
+  {id:'crabby', name:'Crabby the Crab', emoji:'🦀', color:'#e74c3c',
+   lines:['SNAP! Hi! You gave me a fright!','I love shiny sparkly things!','Snap snap means HELLO in crab!'],
+   qLines:['Can you find some shiny gems for me? Pretty please?','WOW! You found them all! SNAP SNAP!']},
+  {id:'jellie', name:'Jelly the Jellyfish', emoji:'🪼', color:'#9b59b6',
+   lines:['I can glow in the dark! So cool!','The deep sea is full of magic!','I am very wise. I think...'],
+   qLines:['Can you find magic orbs for my big spell?','You did it! Amazing! Thank you!']},
+  {id:'dolly', name:'Dolly the Dolphin', emoji:'🐬', color:'#23a6d5',
+   lines:['Eee eee! That means YAY in dolphin!','Dolphins and whales are cousins!','Let\'s swim fast together!'],
+   qLines:['I\'m having a party! Can you find some fish friends?','EEE EEE! Party time! Yay yay yay!']},
+];
+
+const QUEST_T=[
+  {giver:'terry',  target:'shell',     count:3, reward:10, text:'Find {n} shells for Terry!'},
+  {giver:'crabby', target:'diamond',   count:2, reward:12, text:'Find {n} gems for Crabby!'},
+  {giver:'jellie', target:'orb',       count:2, reward:15, text:'Find {n} magic orbs for Jelly!'},
+  {giver:'dolly',  target:'fish',      count:3, reward:15, text:'Find {n} fish for Dolly\'s party!'},
+  {giver:'terry',  target:'star',      count:4, reward:8,  text:'Bring {n} stars to Terry!'},
+  {giver:'crabby', target:'pearl',     count:3, reward:10, text:'Find {n} pearls for Crabby!'},
+  {giver:'jellie', target:'jellyfish', count:3, reward:12, text:'Find {n} jellyfish for Jelly!'},
+  {giver:'dolly',  target:'krill',     count:5, reward:10, text:'Find {n} krill for Dolly!'},
+];
+
+// Stars are 40% of spawns, bigger, brighter — the MAIN thing to collect
+const COLLECT_DEF={
+  star:     {emoji:'⭐',pts:3,size:30,glow:'rgba(255,215,0,1)',    main:true},
+  diamond:  {emoji:'💎',pts:5,size:22,glow:'rgba(100,200,255,.8)', main:false},
+  shell:    {emoji:'🐚',pts:2,size:24,glow:'rgba(255,180,120,.6)', main:false},
+  pearl:    {emoji:'🫧',pts:2,size:20,glow:'rgba(200,230,255,.6)', main:false},
+  orb:      {emoji:'🔮',pts:6,size:22,glow:'rgba(180,100,255,.9)', main:false},
+  fish:     {emoji:'🐠',pts:4,size:26,glow:'rgba(255,150,50,.6)',  main:false},
+  coral:    {emoji:'🪸',pts:2,size:24,glow:'rgba(255,100,100,.5)', main:false},
+  krill:    {emoji:'🦐',pts:1,size:18,glow:'rgba(255,200,150,.4)', main:false},
+  jellyfish:{emoji:'🪼',pts:3,size:24,glow:'rgba(200,150,255,.6)', main:false},
+};
+const SPAWN_IDS=['star','star','star','star','diamond','shell','pearl','orb','fish','coral','krill','jellyfish'];
+
+const WHALE_TYPES={
+  blue:    {name:'Blue Whale',  emoji:'🐋',body:'#1a6aad',belly:'#a8d8f0',fin:'#1560a0',horn:false,cost:0,  desc:'The biggest animal ever!'},
+  humpback:{name:'Humpback',    emoji:'🐋',body:'#2c3e50',belly:'#bdc3c7',fin:'#1a252f',horn:false,cost:20, desc:'Amazing singer of the sea!'},
+  beluga:  {name:'Beluga',      emoji:'⚪',body:'#f0f4f8',belly:'#ffffff', fin:'#d0dce8',horn:false,cost:25, desc:'White and very funny!'},
+  orca:    {name:'Orca',        emoji:'🐋',body:'#111111',belly:'#f0f0f0', fin:'#000',   horn:false,cost:30, desc:'Super smart ocean hunter!'},
+  sperm:   {name:'Sperm Whale', emoji:'🐋',body:'#5d4037',belly:'#c4956a', fin:'#4a2f24',horn:false,cost:35, desc:'Deep diving champion!'},
+  narwhal: {name:'Narwhal',     emoji:'🦄',body:'#7b9eb5',belly:'#d6eaf8', fin:'#5a7f9a',horn:true, cost:40, desc:'The unicorn of the sea!'},
+  fin:     {name:'Fin Whale',   emoji:'🐋',body:'#3a3a4a',belly:'#e8e8d0', fin:'#2a2a3a',horn:false,cost:45, desc:'Second biggest whale!'},
+  pilot:   {name:'Pilot Whale', emoji:'🐋',body:'#1a1a2e',belly:'#4a6080', fin:'#111122',horn:false,cost:50, desc:'Leads the whole pod!'},
+};
+
+const COLORS=[
+  // Basic colors
+  {id:'c_lime',    emoji:'🟢',name:'Lime Green',    cost:8,  body:'#2ecc71',belly:'#a8ffcc'},
+  {id:'c_pink',    emoji:'🩷',name:'Cotton Candy',  cost:8,  body:'#ff69b4',belly:'#ffcce5'},
+  {id:'c_red',     emoji:'🔴',name:'Fire Red',      cost:10, body:'#e74c3c',belly:'#ffc0bb'},
+  {id:'c_orange',  emoji:'🟠',name:'Sunny Orange',  cost:10, body:'#e67e22',belly:'#fde8c8'},
+  {id:'c_purple',  emoji:'🟣',name:'Purple',        cost:12, body:'#8e44ad',belly:'#e8d5ff'},
+  {id:'c_teal',    emoji:'🩵',name:'Sea Teal',      cost:10, body:'#16a085',belly:'#a8e6d8'},
+  {id:'c_ocean',   emoji:'🌊',name:'Deep Ocean',    cost:10, body:'#006994',belly:'#b3ecff'},
+  {id:'c_mint',    emoji:'💚',name:'Minty Fresh',   cost:8,  body:'#00b894',belly:'#c8fff4'},
+  // Special patterns
+  {id:'c_gold',    emoji:'🟡',name:'Golden',        cost:15, body:'#f39c12',belly:'#fff3c0'},
+  {id:'c_silver',  emoji:'🩶',name:'Silver',        cost:15, body:'#95a5a6',belly:'#ecf0f1'},
+  {id:'c_lavender',emoji:'💜',name:'Lavender',      cost:12, body:'#9b59b6',belly:'#f5e6ff'},
+  {id:'c_rose',    emoji:'🌹',name:'Rose Gold',     cost:18, body:'#c0392b',belly:'#ffdde1'},
+  {id:'c_sky',     emoji:'☁️', name:'Sky Blue',     cost:12, body:'#3498db',belly:'#d6eaf8'},
+  {id:'c_night',   emoji:'🌙',name:'Midnight',      cost:20, body:'#1a1a2e',belly:'#16213e'},
+  {id:'c_tropical',emoji:'🌴',name:'Tropical',     cost:20, body:'#00b4d8',belly:'#ade8f4'},
+  {id:'c_bubblegum',emoji:'🍬',name:'Bubblegum',   cost:18, body:'#fd79a8',belly:'#ffeaa7'},
+  // Magic colors
+  {id:'c_galaxy',  emoji:'🌌',name:'Galaxy',        cost:25, body:'#1a0050',belly:'#6a0dad',special:'galaxy'},
+  {id:'c_lava',    emoji:'🌋',name:'Lava',          cost:28, body:'#c0392b',belly:'#e74c3c',special:'lava'},
+  {id:'c_ice',     emoji:'🧊',name:'Icy',           cost:28, body:'#a8d8f0',belly:'#ffffff',special:'ice'},
+  {id:'c_rainbow', emoji:'🌈',name:'Rainbow!',      cost:35, body:'#ff69b4',belly:'#a8f0ff',special:'rainbow'},
+];
+
+const ACCS=[
+  // Hats
+  {id:'a_crown',   emoji:'👑',name:'Crown',         cost:10},
+  {id:'a_hat',     emoji:'🎩',name:'Top Hat',       cost:8},
+  {id:'a_party',   emoji:'🎉',name:'Party Hat',     cost:9},
+  {id:'a_witch',   emoji:'🧙',name:'Witch Hat',     cost:12},
+  {id:'a_cowboy',  emoji:'🤠',name:'Cowboy Hat',    cost:12},
+  {id:'a_tiara',   emoji:'✨',name:'Tiara',         cost:15},
+  {id:'a_propeller',emoji:'🚁',name:'Propeller Hat',cost:14},
+  {id:'a_pirate',  emoji:'🏴‍☠️',name:'Pirate Hat',  cost:16},
+  // Face
+  {id:'a_glasses', emoji:'🕶️',name:'Cool Shades',  cost:7},
+  {id:'a_goggles', emoji:'🥽',name:'Goggles',       cost:10},
+  {id:'a_monocle', emoji:'🧐',name:'Monocle',       cost:12},
+  // Body
+  {id:'a_bow',     emoji:'🎀',name:'Bow',           cost:6},
+  {id:'a_flower',  emoji:'🌸',name:'Flower',        cost:8},
+  {id:'a_halo',    emoji:'😇',name:'Halo',          cost:18},
+  {id:'a_magic',   emoji:'🔮',name:'Magic Orb',     cost:20},
+  {id:'a_anchor',  emoji:'⚓',name:'Anchor',        cost:14},
+  {id:'a_heart',   emoji:'❤️',name:'Heart',         cost:8},
+  {id:'a_rainbow', emoji:'🌈',name:'Rainbow Fin',   cost:22},
+  {id:'a_cape',    emoji:'🦸',name:'Hero Cape',     cost:25},
+  {id:'a_wings',   emoji:'🦋',name:'Fairy Wings',   cost:28},
+];
+
+const POWERS=[
+  {id:'p_speed',  emoji:'⚡',name:'Go Fast!',        cost:20,key:'1',desc:'Swim super fast!'},
+  {id:'p_magnet', emoji:'🧲',name:'Star Magnet!',    cost:25,key:'2',desc:'Stars fly to you!'},
+  {id:'p_shield', emoji:'🛡️',name:'Bubble Shield!',  cost:30,key:'3',desc:'Bubble armor!'},
+  {id:'p_glow',   emoji:'✨',name:'Star Glow!',      cost:20,key:'4',desc:'Glow super bright!'},
+  {id:'p_tiny',   emoji:'🤏',name:'Tiny Mode!',      cost:22,key:'5',desc:'Shrink super small!'},
+  {id:'p_cannon', emoji:'💨',name:'Bubble Cannon!',  cost:28,key:'6',desc:'Shoot bubbles everywhere!'},
+  {id:'p_dash',   emoji:'💨',name:'Super Dash!',     cost:35,key:'7',desc:'Teleport forward!'},
+];
+
+const TRAILS=[
+  {id:'t_bubbles',emoji:'🫧',name:'Bubble Trail',   cost:15,desc:'Leave bubbles as you swim!'},
+  {id:'t_stars',  emoji:'⭐',name:'Star Trail',      cost:20,desc:'Sprinkle stars everywhere!'},
+  {id:'t_rainbow',emoji:'🌈',name:'Rainbow Trail',   cost:30,desc:'Paint rainbows in the sea!'},
+  {id:'t_hearts', emoji:'❤️',name:'Heart Trail',    cost:18,desc:'Leave a trail of love!'},
+  {id:'t_sparkle',emoji:'💫',name:'Sparkle Trail',  cost:25,desc:'Shimmer as you swim!'},
+];
+
+// ════════════════ STATE ════════════════
+const G={
+  whaleType:'blue',bodyColor:'#1a6aad',bellyColor:'#a8d8f0',
+  specialColor:null,rainbowT:0,
+  equippedColor:null,equippedAccs:new Set(),
+  ownedWhales:new Set(['blue']),ownedColors:new Set(),
+  ownedAccs:new Set(),ownedPowers:{},ownedTrails:new Set(),equippedTrail:null,
+  stars:0,level:1,xp:0,xpNext:20,
+  x:1600,y:1600,vx:0,vy:0,angle:0,
+  homeX:1600,homeY:1560,
+  items:[],npcs:[],decor:[],features:[],
+  bubbles:[],starBursts:[],
+  tick:0,
+  activePower:null,powerTimer:0,
+  quest:null,questProg:0,
+  nearNPC:null,
+  dlgOpen:false,caveOpen:false,
+  factsShown:new Set(),
+};
+const KEYS={};
+const WORLD=3200;
+const isTouchDevice=()=>('ontouchstart' in window)||navigator.maxTouchPoints>0;
+
+// ════════════════ CANVAS ════════════════
+const gc=document.getElementById('gc');
+const ctx=gc.getContext('2d');
+function resize(){gc.width=window.innerWidth;gc.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+
+const bgC=document.createElement('canvas');
+bgC.width=WORLD;bgC.height=WORLD;let bgReady=false;
+function buildBg(){
+  const bc=bgC.getContext('2d');
+  const gr=bc.createLinearGradient(0,0,0,WORLD);
+  gr.addColorStop(0,'#1a7aad');gr.addColorStop(.25,'#0a4a7c');
+  gr.addColorStop(.6,'#03224c');gr.addColorStop(1,'#010e20');
+  bc.fillStyle=gr;bc.fillRect(0,0,WORLD,WORLD);
+  for(let i=0;i<22;i++){
+    const rx=Math.random()*WORLD;
+    const lg=bc.createLinearGradient(rx,0,rx+80,WORLD*.55);
+    lg.addColorStop(0,'rgba(255,255,255,.048)');lg.addColorStop(1,'transparent');
+    bc.save();bc.translate(rx,0);bc.rotate((Math.random()-.5)*.18);
+    bc.fillStyle=lg;bc.fillRect(-20,0,55,WORLD*.6);bc.restore();
+  }
+  bgReady=true;
+}
+setTimeout(buildBg,50);
+
+// ════════════════ TITLE BUBBLES ════════════════
+const tc2=document.getElementById('title-canvas');
+const tctx=tc2.getContext('2d');
+const tBubs=[];
+(function initTBubs(){
+  tc2.width=window.innerWidth;tc2.height=window.innerHeight;
+  for(let i=0;i<35;i++) tBubs.push({x:Math.random()*tc2.width,y:Math.random()*tc2.height,r:5+Math.random()*18,sp:.3+Math.random()*.7,t:Math.random()*100});
+})();
+(function animT(){
+  if(document.getElementById('title').style.display==='none')return;
+  tctx.clearRect(0,0,tc2.width,tc2.height);
+  tBubs.forEach(b=>{
+    b.y-=b.sp;b.x+=Math.sin(b.t*.06)*.7;b.t++;
+    if(b.y<-40){b.y=tc2.height+20;b.x=Math.random()*tc2.width;}
+    tctx.save();tctx.globalAlpha=.18;
+    tctx.beginPath();tctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+    tctx.fillStyle='rgba(180,220,255,.3)';tctx.fill();
+    tctx.restore();
+  });
+  requestAnimationFrame(animT);
+})();
+
+// ════════════════ DRESS-UP ════════════════
+let dTab='color';
+const dC=document.getElementById('dress-canvas');
+const dCtx=dC.getContext('2d');
+
+function goToDress(){
+  document.getElementById('title').style.display='none';
+  document.getElementById('dress').classList.add('on');
+  renderDressPreview();renderDGrid();
+}
+function renderDressPreview(){
+  dCtx.clearRect(0,0,200,140);
+  const bg=dCtx.createRadialGradient(100,70,0,100,70,110);
+  bg.addColorStop(0,'#0a3a6a');bg.addColorStop(1,'#021222');
+  dCtx.fillStyle=bg;dCtx.fillRect(0,0,200,140);
+  for(let i=0;i<4;i++){
+    const bx=20+i*46+Math.sin(G.tick*.05+i)*6;
+    const by=120-((G.tick*(.4+i*.15)+i*28)%110);
+    dCtx.save();dCtx.globalAlpha=.18;
+    dCtx.beginPath();dCtx.arc(bx,by,3+i,0,Math.PI*2);
+    dCtx.fillStyle='rgba(255,255,255,.3)';dCtx.fill();dCtx.restore();
+  }
+  let bc=G.bodyColor,be=G.bellyColor;
+  if(G.specialColor==='rainbow'){bc=getRainbow(G.rainbowT);be=getRainbow(G.rainbowT+1.5);}
+  if(G.specialColor==='galaxy'){bc=`hsl(${(G.tick*.8)%360},70%,30%)`;be=`hsl(${(G.tick*.8+60)%360},60%,60%)`;}
+  if(G.specialColor==='lava'){bc=`hsl(${10+Math.sin(G.tick*.05)*10|0},90%,${35+Math.sin(G.tick*.08)*8|0}%)`;be='hsl(25,100%,60%)';}
+  if(G.specialColor==='ice'){bc=`hsl(${195+Math.sin(G.tick*.04)*8|0},60%,${70+Math.sin(G.tick*.06)*8|0}%)`;be='#ffffff';}
+  drawWhale(dCtx,100,74,.82,bc,be);
+  document.getElementById('d-wname').textContent=WHALE_TYPES[G.whaleType].name;
+}
+function setDTab(t){
+  dTab=t;
+  document.querySelectorAll('.dtab').forEach((el,i)=>el.classList.toggle('on',['color','acc'][i]===t));
+  renderDGrid();
+}
+function renderDGrid(){
+  const g=document.getElementById('dgrid');g.innerHTML='';
+  const items=dTab==='color'?COLORS:ACCS;
+  items.forEach(item=>{
+    const on=dTab==='color'?G.equippedColor===item.id:G.equippedAccs.has(item.id);
+    const d=document.createElement('div');
+    d.className='ditem'+(on?' on':'');
+    d.innerHTML=`<span class="ditem-e">${item.emoji}</span><span class="ditem-n">${item.name}</span>`;
+    d.onclick=()=>{
+      if(dTab==='color'){
+        G.equippedColor=item.id;G.bodyColor=item.body;G.bellyColor=item.belly;
+        G.specialColor=item.special||null;G.rainbowT=0;
+      } else {
+        if(G.equippedAccs.has(item.id)) G.equippedAccs.delete(item.id);
+        else G.equippedAccs.add(item.id);
+      }
+      renderDGrid();
+    };
+    g.appendChild(d);
+  });
+}
+function startGame(){
+  document.getElementById('dress').classList.remove('on');
+  document.getElementById('hud').style.display='flex';
+  document.getElementById('cave-btn').classList.add('on');
+  document.getElementById('cave-lbl').classList.add('on');
+  initWorld();
+  initTouch();
+  updateHUD();
+  requestAnimationFrame(loop);
+  setTimeout(()=>showFact({e:'🌊',ttl:'Let\'s go!',t:'Swim around and collect ⭐ stars! Talk to your ocean friends! Visit your cave any time!'}),1200);
+}
+
+// ════════════════ WORLD ════════════════
+function initWorld(){
+  G.items=[];
+  for(let i=0;i<300;i++){
+    const id=SPAWN_IDS[Math.floor(Math.random()*SPAWN_IDS.length)];
+    const def=COLLECT_DEF[id];
+    G.items.push({id,iid:i,x:100+Math.random()*(WORLD-200),y:100+Math.random()*(WORLD-200),
+      collected:false,wobble:Math.random()*Math.PI*2,ws:.022+Math.random()*.03,
+      size:def.size,main:def.main});
+  }
+
+  // Decor — rocks and weeds, fill-only
+  G.decor=[];
+  const dtypes=['rock','weed'];
+  for(let i=0;i<100;i++) G.decor.push({type:dtypes[i%2],x:60+Math.random()*(WORLD-120),y:60+Math.random()*(WORLD-120),s:.6+Math.random()*.8,seed:Math.random()*100});
+
+  // World features — special interactive/visual elements
+  G.features=[
+    // Treasure chests — burst with items when touched
+    ...Array(8).fill(0).map((_,i)=>({
+      type:'chest',id:'chest_'+i,
+      x:200+Math.random()*(WORLD-400),y:200+Math.random()*(WORLD-400),
+      opened:false,wobble:Math.random()*Math.PI*2
+    })),
+    // Message bottles — give whale facts
+    ...Array(6).fill(0).map((_,i)=>({
+      type:'bottle',id:'bottle_'+i,
+      x:200+Math.random()*(WORLD-400),y:200+Math.random()*(WORLD-400),
+      read:false,wobble:Math.random()*Math.PI*2,
+      factIdx:i%FACTS.length
+    })),
+    // Volcano — visual landmark, spits collectibles periodically
+    {type:'volcano',id:'volcano_0',x:400,y:400,nextErupt:300+Math.random()*400},
+    // Sunken ship — near Dolly's zone
+    {type:'ship',id:'ship_0',x:400,y:2800},
+    // Coral reef arch — near Terry's zone
+    {type:'reef',id:'reef_0',x:2800,y:400},
+    // Kelp forest — near Jelly's zone
+    {type:'kelp',id:'kelp_0',x:400,y:2400},
+    // Ice cavern — near the narwhal area
+    {type:'ice',id:'ice_0',x:2800,y:2800},
+  ];
+
+  // NPCs in THEMED ZONES — each has a unique home far from spawn
+  // Terry → Coral Reef (top-right)
+  // Dolly → Sunken Ship (bottom-left)
+  // Crabby → Sandy Floor (bottom-right)
+  // Jelly → Deep Dark Zone (top-left, deep)
+  const npcPositions={
+    terry:  {x:2700,y:500,  zone:'🪸 Coral Reef'},
+    dolly:  {x:500, y:2700, zone:'🚢 Sunken Ship'},
+    crabby: {x:2700,y:2700, zone:'🏖️ Sandy Floor'},
+    jellie: {x:500, y:500,  zone:'🌑 Deep Zone'},
+  };
+  G.npcs=NPC_DEFS.map(def=>{
+    const pos=npcPositions[def.id]||{x:1600,y:1600,zone:''};
+    return{...def,...pos,wobble:Math.random()*Math.PI*2,questGiven:false};
+  });
+  updateQHUD();
+}
+
+// ════════════════ CAVE ════════════════
+let cTab='whale';
+function openCave(){
+  G.caveOpen=true;
+  document.getElementById('cave').classList.add('on');
+  document.getElementById('cave-gold').textContent='⭐ '+G.stars+' Stars';
+  renderCave();
+}
+function closeCave(){
+  G.caveOpen=false;
+  document.getElementById('cave').classList.remove('on');
+}
+function setCTab(t){
+  cTab=t;
+  document.querySelectorAll('.ctab').forEach((el,i)=>el.classList.toggle('on',['whale','color','acc','trail','power'][i]===t));
+  renderCave();
+}
+function renderCave(){
+  document.getElementById('cave-gold').textContent='⭐ '+G.stars+' Stars';
+  const grid=document.getElementById('cgrid');grid.innerHTML='';
+  if(cTab==='whale'){
+    Object.entries(WHALE_TYPES).forEach(([id,wt])=>{
+      const owned=G.ownedWhales.has(id),on=G.whaleType===id;
+      const d=mkCI(wt.emoji,wt.name,owned?(on?'✅ You are this!':'Tap to switch'):'⭐ '+wt.cost,on?'equipped':owned?'owned':'',wt.desc);
+      d.onclick=()=>buyWhale(id,wt);grid.appendChild(d);
+    });
+  } else if(cTab==='color'){
+    COLORS.forEach(c=>{
+      const owned=G.ownedColors.has(c.id),on=G.equippedColor===c.id;
+      const d=mkCI(c.emoji,c.name,owned?(on?'✅ On!':'Tap to wear'):'⭐ '+c.cost,on?'equipped':owned?'owned':'','');
+      d.onclick=()=>buyColor(c);grid.appendChild(d);
+    });
+  } else if(cTab==='acc'){
+    ACCS.forEach(a=>{
+      const owned=G.ownedAccs.has(a.id),on=G.equippedAccs.has(a.id);
+      const d=mkCI(a.emoji,a.name,owned?(on?'✅ On!':'Tap to toggle'):'⭐ '+a.cost,on?'equipped':owned?'owned':'','');
+      d.onclick=()=>buyAcc(a);grid.appendChild(d);
+    });
+  } else if(cTab==='trail'){
+    TRAILS.forEach(t=>{
+      const owned=G.ownedTrails.has(t.id),on=G.equippedTrail===t.id;
+      const d=mkCI(t.emoji,t.name,owned?(on?'✅ On!':'Tap to use'):'⭐ '+t.cost,on?'equipped':owned?'owned':'',t.desc);
+      d.onclick=()=>buyTrail(t);grid.appendChild(d);
+    });
+  } else {
+    POWERS.forEach(p=>{
+      const owned=G.ownedPowers[p.id];
+      const d=mkCI(p.emoji,p.name,owned?'✅ Got it!':'⭐ '+p.cost,owned?'owned':'',p.desc);
+      d.onclick=()=>buyPower(p);grid.appendChild(d);
+    });
+  }
+}
+function mkCI(emoji,name,cost,cls,desc){
+  const d=document.createElement('div');
+  d.className='citem'+(cls?' '+cls:'');
+  d.innerHTML=`<span class="ci-e">${emoji}</span><div class="ci-n">${name}</div><div class="ci-c">${cost}</div>${desc?`<div class="ci-d">${desc}</div>`:''}`;
+  return d;
+}
+function cantAfford(){showFact({e:'😅',ttl:'Need more stars!',t:'Collect more ⭐ stars then come back!'});}
+function buyWhale(id,wt){
+  if(!G.ownedWhales.has(id)){
+    if(G.stars<wt.cost){cantAfford();return;}
+    G.stars-=wt.cost;G.ownedWhales.add(id);
+    spawnSparkles(window.innerWidth/2,window.innerHeight/2,12);
+    showFact({e:'🐋',ttl:'New Whale!',t:'You got the '+wt.name+'! '+wt.desc});
+  }
+  G.whaleType=id;G.bodyColor=wt.body;G.bellyColor=wt.belly;
+  G.equippedColor=null;G.specialColor=null;G.rainbowT=0;
+  updateHUD();renderCave();
+}
+function buyColor(c){
+  if(!G.ownedColors.has(c.id)&&c.cost>0){
+    if(G.stars<c.cost){cantAfford();return;}
+    G.stars-=c.cost;G.ownedColors.add(c.id);
+    spawnSparkles(window.innerWidth/2,window.innerHeight/2,8);
+  }
+  G.equippedColor=c.id;G.bodyColor=c.body;G.bellyColor=c.belly;
+  G.specialColor=c.special||null;G.rainbowT=0;
+  updateHUD();renderCave();
+}
+function buyAcc(a){
+  if(!G.ownedAccs.has(a.id)){
+    if(G.stars<a.cost){cantAfford();return;}
+    G.stars-=a.cost;G.ownedAccs.add(a.id);
+    spawnSparkles(window.innerWidth/2,window.innerHeight/2,6);
+  }
+  if(G.equippedAccs.has(a.id)) G.equippedAccs.delete(a.id);
+  else G.equippedAccs.add(a.id);
+  updateHUD();renderCave();
+}
+function buyPower(p){
+  if(!G.ownedPowers[p.id]){
+    if(G.stars<p.cost){cantAfford();return;}
+    G.stars-=p.cost;G.ownedPowers[p.id]=true;
+    spawnSparkles(window.innerWidth/2,window.innerHeight/2,8);
+    showFact({e:p.emoji,ttl:'New Power!',t:'You got: '+p.name+'! '+p.desc});
+  }
+  updateHUD();renderCave();buildTPowers();
+}
+function buyTrail(t){
+  if(!G.ownedTrails.has(t.id)){
+    if(G.stars<t.cost){cantAfford();return;}
+    G.stars-=t.cost;G.ownedTrails.add(t.id);
+    spawnSparkles(window.innerWidth/2,window.innerHeight/2,6);
+  }
+  G.equippedTrail=G.equippedTrail===t.id?null:t.id;
+  updateHUD();renderCave();
+}
+
+// ════════════════ DIALOGUE ════════════════
+let pendingQ=null;
+function openDlg(npc,txt,sub,showAcc,fact){
+  document.getElementById('dlg-av').textContent=npc.emoji;
+  document.getElementById('dlg-who').textContent=npc.name;
+  document.getElementById('dlg-txt').textContent=txt;
+  document.getElementById('dlg-sub').textContent=sub||'';
+  document.getElementById('dlg-acc').style.display=showAcc?'inline-block':'none';
+  const fEl=document.getElementById('dlg-fact');
+  if(fact){
+    document.getElementById('dlg-fact-ttl').textContent=fact.e+' Did You Know?';
+    document.getElementById('dlg-fact-txt').textContent=fact.t;
+    fEl.style.display='block';
+  } else fEl.style.display='none';
+  document.getElementById('dlg').classList.add('on');
+  G.dlgOpen=true;
+}
+function closeDlg(){
+  document.getElementById('dlg').classList.remove('on');
+  G.dlgOpen=false;pendingQ=null;
+}
+function acceptQuest(){
+  closeDlg();
+  if(pendingQ){G.quest={npc:pendingQ.npc,qt:pendingQ.qt};G.questProg=0;pendingQ.npc.questGiven=true;updateQHUD();}
+}
+function talkToNPC(npc){
+  if(G.dlgOpen)return;
+  const unseen=[...Array(FACTS.length).keys()].filter(i=>!G.factsShown.has(i));
+  const fi=unseen.length>0?unseen[Math.floor(Math.random()*unseen.length)]:Math.floor(Math.random()*FACTS.length);
+  G.factsShown.add(fi);
+  const fact=FACTS[fi];
+  if(G.quest&&G.questProg>=G.quest.qt.count&&G.quest.npc.id===npc.id){
+    G.stars+=G.quest.qt.reward;gainXP(12);updateHUD();
+    spawnSparkles(gc.width/2,gc.height/2,14);
+    npc.questGiven=false;
+    openDlg(npc,npc.qLines[1],'You got ⭐'+G.quest.qt.reward+' stars! Yay!',false,fact);
+    G.quest=null;G.questProg=0;updateQHUD();return;
+  }
+  if(!G.quest&&!npc.questGiven){
+    const pool=QUEST_T.filter(q=>q.giver===npc.id);
+    if(pool.length){
+      const qt=pool[Math.floor(Math.random()*pool.length)];
+      pendingQ={npc,qt};
+      openDlg(npc,npc.qLines[0],'📜 '+qt.text.replace('{n}',qt.count)+' — You get ⭐'+qt.reward+'!',true,fact);
+      return;
+    }
+  }
+  openDlg(npc,npc.lines[Math.floor(Math.random()*npc.lines.length)],'',false,fact);
+}
+function updateQHUD(){
+  const el=document.getElementById('qhud');
+  if(!G.quest){el.classList.remove('on');return;}
+  el.classList.add('on');
+  document.getElementById('qh-who').textContent='📜 '+G.quest.npc.name+' needs help!';
+  document.getElementById('qh-text').textContent=G.quest.qt.text.replace('{n}',G.quest.qt.count);
+  const pct=Math.min(100,G.questProg/G.quest.qt.count*100);
+  document.getElementById('qh-bar').style.width=pct+'%';
+  document.getElementById('qh-cnt').textContent=G.questProg+' out of '+G.quest.qt.count;
+}
+
+// ════════════════ FACTS ════════════════
+let factTO=null;
+function showFact(f){
+  document.getElementById('fact-ico').textContent=f.e;
+  document.getElementById('fact-ttl').textContent=f.ttl||'Did You Know?';
+  document.getElementById('fact-txt').textContent=f.t;
+  document.getElementById('fact').classList.add('on');
+  if(factTO)clearTimeout(factTO);
+  factTO=setTimeout(dismissFact,9000);
+}
+function dismissFact(){
+  document.getElementById('fact').classList.remove('on');
+  if(factTO){clearTimeout(factTO);factTO=null;}
+}
+
+// ════════════════ LEVEL / HUD ════════════════
+function gainXP(n){
+  G.xp+=n;
+  if(G.xp>=G.xpNext){G.xp-=G.xpNext;G.level++;G.xpNext=Math.floor(G.xpNext*1.4);G.stars+=5;showLevelUp();}
+}
+function showLevelUp(){
+  document.getElementById('lvl-t').textContent='🌟 Level '+G.level+'! 🌟';
+  document.getElementById('lvl-s').textContent='Wow! You got 5 bonus stars!';
+  const el=document.getElementById('lvlup');
+  el.classList.add('on');setTimeout(()=>el.classList.remove('on'),2600);
+  spawnSparkles(gc.width/2,gc.height/2,22);
+}
+function updateHUD(){
+  document.getElementById('hud-stars').textContent='⭐ '+G.stars;
+  document.getElementById('hud-name').textContent=WHALE_TYPES[G.whaleType].name+' · Level '+G.level;
+}
+
+// ════════════════ SPARKLES ════════════════
+function spawnSparkles(sx,sy,n){
+  const es=['⭐','✨','💫','🌟'];
+  for(let i=0;i<n;i++){
+    setTimeout(()=>{
+      const s=document.createElement('div');s.className='sp';
+      s.textContent=es[Math.floor(Math.random()*es.length)];
+      s.style.left=(sx+(Math.random()-.5)*200)+'px';
+      s.style.top=(sy+(Math.random()-.5)*130)+'px';
+      document.body.appendChild(s);setTimeout(()=>s.remove(),900);
+    },i*55);
+  }
+}
+
+// ════════════════ POWERS ════════════════
+function usePower(key){
+  const p=POWERS.find(pw=>pw.key===key&&G.ownedPowers[pw.id]);
+  if(!p||G.powerTimer>0)return;
+  G.activePower=p.id;G.powerTimer=190;
+  spawnSparkles(gc.width/2,gc.height/2,5);
+}
+function buildTPowers(){
+  const c=document.getElementById('tc-powers');c.innerHTML='';
+  POWERS.filter(p=>G.ownedPowers[p.id]).forEach(p=>{
+    const btn=document.createElement('button');
+    btn.className='tpbtn'+(G.activePower===p.id&&G.powerTimer>0?' active':'');
+    btn.textContent=p.emoji;
+    btn.addEventListener('touchstart',e=>{e.preventDefault();usePower(p.key);},{passive:false});
+    btn.onclick=()=>usePower(p.key);
+    c.appendChild(btn);
+  });
+}
+
+// ════════════════ INPUT ════════════════
+window.addEventListener('keydown',e=>{
+  KEYS[e.key]=true;
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();
+  if(e.key===' '||e.key==='e'||e.key==='E'){if(G.nearNPC)talkToNPC(G.nearNPC);}
+  if(['1','2','3','4'].includes(e.key))usePower(e.key);
+});
+window.addEventListener('keyup',e=>KEYS[e.key]=false);
+
+// ════════════════ DRAG-TO-SWIM ════════════════
+const drag={active:false,id:null,sx:0,sy:0,dx:0,dy:0};
+const DRAG_FULL=65;
+const canvas=document.getElementById('gc');
+
+function initTouch(){
+  if(!isTouchDevice())return;
+  document.getElementById('tc').style.display='block';
+  const ripple=document.getElementById('drag-ripple');
+  canvas.addEventListener('touchstart',e=>{
+    if(G.dlgOpen||G.caveOpen)return;
+    e.preventDefault();
+    const t=e.changedTouches[0];
+    drag.active=true;drag.id=t.identifier;
+    drag.sx=t.clientX;drag.sy=t.clientY;drag.dx=0;drag.dy=0;
+    ripple.style.left=t.clientX+'px';ripple.style.top=t.clientY+'px';
+    ripple.style.display='block';ripple.style.opacity='1';
+  },{passive:false});
+  canvas.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    for(const t of e.changedTouches){
+      if(t.identifier!==drag.id)continue;
+      drag.dx=t.clientX-drag.sx;drag.dy=t.clientY-drag.sy;
+      ripple.style.left=t.clientX+'px';ripple.style.top=t.clientY+'px';
+    }
+  },{passive:false});
+  function endDrag(e){
+    for(const t of e.changedTouches){
+      if(t.identifier!==drag.id)continue;
+      const mag=Math.sqrt(drag.dx*drag.dx+drag.dy*drag.dy);
+      if(mag<14&&G.nearNPC)talkToNPC(G.nearNPC);
+      drag.active=false;drag.dx=0;drag.dy=0;
+      ripple.style.opacity='0';
+      setTimeout(()=>{ripple.style.display='none';},150);
+    }
+  }
+  canvas.addEventListener('touchend',endDrag,{passive:false});
+  canvas.addEventListener('touchcancel',endDrag,{passive:false});
+}
+function applyDrag(){
+  if(!drag.active)return;
+  const mag=Math.sqrt(drag.dx*drag.dx+drag.dy*drag.dy);
+  if(mag<8)return;
+  const sc=Math.min(1,mag/DRAG_FULL);
+  G.vx+=(drag.dx/mag)*SPEED*sc*1.2;
+  G.vy+=(drag.dy/mag)*SPEED*sc*1.2;
+}
+
+// ════════════════ UPDATE ════════════════
+const SPEED=3.8,FRICTION=.87,MAXV=7;
+
+function update(){
+  G.tick++;
+  if(G.dlgOpen||G.caveOpen){
+    // still animate dress preview when in dress screen
+    if(document.getElementById('dress').classList.contains('on')){
+      if(G.specialColor==='rainbow')G.rainbowT+=.022;
+      renderDressPreview();
+    }
+    return;
+  }
+  if(G.specialColor==='rainbow')G.rainbowT+=.022;
+
+  if(G.powerTimer>0)G.powerTimer--;
+  if(G.powerTimer===0&&G.activePower){G.activePower=null;buildTPowers();}
+  const sm=G.activePower==='p_speed'&&G.powerTimer>0?2.2:1;
+
+  const up=KEYS['ArrowUp']||KEYS['w']||KEYS['W'];
+  const dn=KEYS['ArrowDown']||KEYS['s']||KEYS['S'];
+  const lt=KEYS['ArrowLeft']||KEYS['a']||KEYS['A'];
+  const rt=KEYS['ArrowRight']||KEYS['d']||KEYS['D'];
+  if(up)G.vy-=SPEED*sm;if(dn)G.vy+=SPEED*sm;
+  if(lt)G.vx-=SPEED*sm;if(rt)G.vx+=SPEED*sm;
+  applyDrag();
+  G.vx*=FRICTION;G.vy*=FRICTION;
+  const sp=Math.sqrt(G.vx*G.vx+G.vy*G.vy);
+  if(sp>MAXV*sm){G.vx=G.vx/sp*MAXV*sm;G.vy=G.vy/sp*MAXV*sm;}
+  if(sp>.4)G.angle=Math.atan2(G.vy,G.vx);
+  G.x=Math.max(80,Math.min(WORLD-80,G.x+G.vx));
+  G.y=Math.max(80,Math.min(WORLD-80,G.y+G.vy));
+
+  if(G.activePower==='p_magnet'&&G.powerTimer>0){
+    G.items.forEach(it=>{if(it.collected)return;const dx=it.x-G.x,dy=it.y-G.y,d=Math.sqrt(dx*dx+dy*dy);if(d<300){it.x-=dx/d*5;it.y-=dy/d*5;}});
+  }
+
+  G.items.forEach(it=>it.wobble+=it.ws);
+  G.npcs.forEach(n=>n.wobble+=.018);
+
+  // Collect — bigger radius for stars (easier to grab)
+  const cr=G.activePower==='p_magnet'&&G.powerTimer>0?75:44;
+  G.items.forEach(it=>{
+    if(it.collected)return;
+    const dx=it.x-G.x,dy=it.y-G.y;
+    if(dx*dx+dy*dy<cr*cr){
+      it.collected=true;
+      const def=COLLECT_DEF[it.id];
+      G.stars+=def.pts;gainXP(def.pts);updateHUD();
+      G.starBursts.push({wx:it.x,wy:it.y,txt:'+'+def.pts+'⭐',life:55,ml:55,big:def.main});
+      if(def.main)spawnSparkles(gc.width/2,gc.height/2,3);
+      spawnBubs(G.x,G.y,3);
+      if(G.quest&&it.id===G.quest.qt.target){
+        G.questProg=Math.min(G.questProg+1,G.quest.qt.count);updateQHUD();
+        if(G.questProg>=G.quest.qt.count)
+          setTimeout(()=>showFact({e:'🎉',ttl:'Quest done!',t:'Go back to '+G.quest.npc.name+'! They have stars for you!'}),400);
+      }
+    }
+  });
+
+  // Trail effect
+  if(G.equippedTrail&&Math.sqrt(G.vx*G.vx+G.vy*G.vy)>.8&&G.tick%8===0){
+    const te={bubbles:'🫧',stars:'⭐',rainbow:'🌈',hearts:'❤️',sparkle:'💫'}[G.equippedTrail.replace('t_','')]||'✨';
+    G.starBursts.push({wx:G.x+(Math.random()-.5)*20,wy:G.y+(Math.random()-.5)*20,txt:te,life:30,ml:30,big:false,trail:true});
+  }
+
+  // World features interaction
+  if(G.features) G.features.forEach(f=>{
+    if(f.opened||f.read)return;
+    const dx=f.x-G.x,dy=f.y-G.y;
+    if(dx*dx+dy*dy<70*70){
+      if(f.type==='chest'&&!f.opened){
+        f.opened=true;
+        // burst 6 random items
+        for(let i=0;i<6;i++){
+          const id=SPAWN_IDS[Math.floor(Math.random()*SPAWN_IDS.length)];
+          const def=COLLECT_DEF[id];
+          G.items.push({id,iid:9000+Math.random()*9000|0,
+            x:f.x+(Math.random()-.5)*80,y:f.y+(Math.random()-.5)*80,
+            collected:false,wobble:Math.random()*Math.PI*2,ws:.025,
+            size:def.size,main:def.main});
+        }
+        spawnSparkles(gc.width/2,gc.height/2,10);
+        showFact({e:'🎁',ttl:'Treasure!',t:'You found a treasure chest! Stars and gems flew out!'});
+      }
+      if(f.type==='bottle'&&!f.read){
+        f.read=true;
+        showFact(FACTS[f.factIdx%FACTS.length]);
+      }
+    }
+    // Volcano eruption
+    if(f.type==='volcano'){
+      f.wobble=(f.wobble||0)+.02;
+      f.nextErupt=(f.nextErupt||300)-1;
+      if(f.nextErupt<=0){
+        f.nextErupt=400+Math.random()*600;
+        // spawn collectibles around volcano
+        for(let i=0;i<4;i++){
+          const id=SPAWN_IDS[Math.floor(Math.random()*SPAWN_IDS.length)];
+          const def=COLLECT_DEF[id];
+          const a=Math.random()*Math.PI*2,r=60+Math.random()*100;
+          G.items.push({id,iid:9000+Math.random()*9000|0,
+            x:f.x+Math.cos(a)*r,y:f.y+Math.sin(a)*r,
+            collected:false,wobble:Math.random()*Math.PI*2,ws:.025,
+            size:def.size,main:def.main});
+        }
+      }
+    }
+  });
+  G.npcs.forEach(npc=>{const dx=npc.x-G.x,dy=npc.y-G.y;if(dx*dx+dy*dy<170*170)G.nearNPC=npc;});
+
+  const hint=document.getElementById('hud-hint');
+  hint.textContent=G.nearNPC?(isTouchDevice()?'Tap to talk!':'Press E to talk!'):'';
+
+  if(sp>1&&G.tick%15===0)spawnBubs(G.x,G.y,1);
+  if(G.activePower==='p_shield'&&G.powerTimer>0&&G.tick%7===0)spawnBubs(G.x,G.y,2);
+
+  G.bubbles=G.bubbles.filter(b=>{b.y-=b.sp;b.x+=Math.sin(b.t*.09)*.6;b.t++;b.life--;return b.life>0;});
+  G.starBursts=G.starBursts.filter(s=>{s.life--;return s.life>0;});
+}
+
+function spawnBubs(wx,wy,n){
+  for(let i=0;i<n;i++)G.bubbles.push({x:wx+(Math.random()-.5)*26,y:wy+(Math.random()-.5)*16,r:3+Math.random()*8,sp:.65+Math.random()*.8,life:75+Math.random()*50,t:0});
+}
+
+// ════════════════ HELPERS ════════════════
+function getRainbow(t){return`rgb(${Math.floor(Math.sin(t)*127+128)},${Math.floor(Math.sin(t+2.094)*127+128)},${Math.floor(Math.sin(t+4.189)*127+128)})`;}
+function darken(hex){try{const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`rgb(${Math.floor(r*.58)},${Math.floor(g*.58)},${Math.floor(b*.58)})`;}catch{return'#222';}}
+
+// ════════════════ WHALE DRAW ════════════════
+function drawWhale(c,cx,cy,scale,bc,be){
+  const fin=darken(bc);
+  const wt=WHALE_TYPES[G.whaleType];
+  const sp=Math.sqrt(G.vx*G.vx+G.vy*G.vy);
+  const wag=Math.sin(G.tick*.18)*.2*(sp>.4?1:0);
+  c.save();c.translate(cx,cy);c.scale(scale,scale);
+  c.save();c.shadowColor='rgba(0,0,0,.22)';c.shadowBlur=14;c.shadowOffsetY=5;
+  c.save();c.translate(-78,0);c.rotate(wag);
+  c.beginPath();c.moveTo(0,0);c.bezierCurveTo(-28,-10,-36,-40,-18,-58);c.bezierCurveTo(-6,-30,8,-6,10,-2);c.closePath();c.fillStyle=bc;c.fill();
+  c.beginPath();c.moveTo(0,0);c.bezierCurveTo(-28,10,-36,40,-18,58);c.bezierCurveTo(-6,30,8,6,10,2);c.closePath();c.fillStyle=darken(bc);c.fill();
+  c.restore();
+  c.beginPath();c.moveTo(-8,22);c.bezierCurveTo(-32,60,-8,62,8,58);c.bezierCurveTo(18,46,16,30,14,22);c.closePath();c.fillStyle=fin;c.fill();
+  c.beginPath();c.ellipse(14,0,84,46,0,0,Math.PI*2);c.fillStyle=bc;c.fill();
+  c.beginPath();c.ellipse(22,18,60,24,-.12,0,Math.PI*2);c.fillStyle=be;c.fill();
+  c.beginPath();c.moveTo(10,-46);c.bezierCurveTo(38,-18,56,-6,60,-4);c.bezierCurveTo(42,-10,12,-10,10,-46);c.fillStyle=fin;c.fill();
+  c.restore();
+  if(wt.horn){c.strokeStyle='#d4af37';c.lineWidth=6;c.lineCap='round';c.beginPath();c.moveTo(82,-30);c.lineTo(130,14);c.stroke();}
+  c.beginPath();c.arc(74,-10,9,0,Math.PI*2);c.fillStyle='#fff';c.fill();
+  c.beginPath();c.arc(76,-10,5,0,Math.PI*2);c.fillStyle='#1a1a2e';c.fill();
+  c.beginPath();c.arc(78,-12,1.8,0,Math.PI*2);c.fillStyle='#fff';c.fill();
+  c.beginPath();c.arc(68,5,11,.1,Math.PI*.82);c.strokeStyle='rgba(10,40,80,.6)';c.lineWidth=2.5;c.stroke();
+  c.beginPath();c.ellipse(80,-33,7,4,0,0,Math.PI*2);c.fillStyle=fin;c.fill();
+  const apos={a_crown:[68,-55],a_hat:[67,-58],a_bow:[68,-46],a_glasses:[58,-10],a_flower:[78,-48],a_halo:[68,-62],a_party:[64,-56],a_magic:[40,-52]};
+  c.font='26px serif';c.textAlign='center';c.textBaseline='middle';
+  ACCS.forEach(a=>{if(!G.equippedAccs.has(a.id))return;const[ax,ay]=apos[a.id]||[60,-48];c.fillText(a.emoji,ax,ay);});
+  c.restore();
+}
+
+// ════════════════ DRAW ════════════════
+function draw(){
+  const W=gc.width,H=gc.height;
+  const camX=G.x-W/2,camY=G.y-H/2;
+  ctx.clearRect(0,0,W,H);
+  if(bgReady){
+    // Fill entire screen with deep ocean first so edges never show black
+    ctx.fillStyle='#010e20';ctx.fillRect(0,0,W,H);
+    const sx=Math.max(0,camX),sy=Math.max(0,camY);
+    const sw=Math.min(WORLD-sx,W),sh=Math.min(WORLD-sy,H);
+    if(sw>0&&sh>0) ctx.drawImage(bgC,sx,sy,sw,sh,sx-camX,sy-camY,sw,sh);
+  } else {ctx.fillStyle='#03224c';ctx.fillRect(0,0,W,H);}
+  // Soft world-edge vignette — NO strokeRect (causes white lines)
+  const edgePad=120;
+  [[0,-camY,'top'],[0,WORLD-camY-H,'bottom'],[-camX,0,'left'],[WORLD-camX-W,0,'right']].forEach(([dist,,side])=>{
+    if(dist>edgePad) return;
+    const alpha=Math.max(0,(edgePad-dist)/edgePad)*0.55;
+    ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle='#010e20';
+    if(side==='top')    ctx.fillRect(0,0,W,edgePad-dist);
+    if(side==='bottom') ctx.fillRect(0,H-(edgePad-dist),W,edgePad-dist);
+    if(side==='left')   ctx.fillRect(0,0,edgePad-dist,H);
+    if(side==='right')  ctx.fillRect(W-(edgePad-dist),0,edgePad-dist,H);
+    ctx.restore();
+  });
+
+  // Decor — fill only, no stroke anywhere
+  G.decor.forEach(d=>{
+    const sx=d.x-camX,sy=d.y-camY;
+    if(sx<-80||sx>W+80||sy<-80||sy>H+80)return;
+    ctx.save();ctx.translate(sx,sy);ctx.scale(d.s,d.s);ctx.globalAlpha=.45;
+    if(d.type==='rock'){
+      ctx.fillStyle=`hsl(${210+d.seed*20|0},18%,${26+d.seed*12|0}%)`;
+      ctx.beginPath();ctx.ellipse(0,0,22,14,d.seed*.8,0,Math.PI*2);ctx.fill();
+      // small highlight on rock — fill only
+      ctx.globalAlpha=.12;
+      ctx.fillStyle='#fff';
+      ctx.beginPath();ctx.ellipse(-5,-4,8,4,-.4,0,Math.PI*2);ctx.fill();
+    } else if(d.type==='weed'){
+      // Draw weed as filled teardrop shapes stacked, NO stroke
+      const hue=140+d.seed*30|0;
+      const col=`hsl(${hue},55%,28%)`;
+      const col2=`hsl(${hue},55%,38%)`;
+      ctx.fillStyle=col;
+      ctx.beginPath();ctx.ellipse(2,-8,5,12,d.seed*.3-.15,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=col2;
+      ctx.beginPath();ctx.ellipse(-3,-18,4,9,d.seed*.3+.2,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=col;
+      ctx.beginPath();ctx.ellipse(5,-24,3,7,d.seed*.3-.3,0,Math.PI*2);ctx.fill();
+    }
+    // bubble cluster decor removed — was causing white oval artifacts
+    ctx.restore();
+  });
+
+  // Home cave
+  drawHome(G.homeX-camX,G.homeY-camY);
+
+  // World features
+  if(G.features) G.features.forEach(f=>{
+    const sx=f.x-camX,sy=f.y-camY;
+    if(sx<-160||sx>W+160||sy<-160||sy>H+160)return;
+    drawFeature(f,sx,sy);
+  });
+
+  // NPCs — draw zone label behind them
+  G.npcs.forEach(npc=>{
+    const sx=npc.x-camX,sy=npc.y-camY;
+    if(sx<-90||sx>W+90||sy<-90||sy>H+90)return;
+    if(G.quest&&G.questProg>=G.quest.qt.count&&G.quest.npc.id===npc.id) drawBadge(sx,sy-65,'!','#e74c3c');
+    else if(!G.quest&&!npc.questGiven&&QUEST_T.some(q=>q.giver===npc.id)) drawBadge(sx,sy-65,'?','#ffd700');
+    const bob=Math.sin(npc.wobble)*5;
+    // Zone label
+    if(npc.zone){
+      ctx.save();ctx.globalAlpha=.55;
+      ctx.font='13px Bubblegum Sans,cursive';ctx.fillStyle='#7ee8ff';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(npc.zone,sx,sy+bob+58);ctx.restore();
+    }
+    ctx.save();ctx.shadowColor=npc.color;ctx.shadowBlur=18;
+    ctx.font='54px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(npc.emoji,sx,sy+bob);ctx.restore();
+    ctx.font='bold 14px Bubblegum Sans,cursive';
+    ctx.fillStyle='rgba(255,255,255,.85)';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(npc.name,sx,sy+bob+42);
+  });
+
+  // Collectibles — stars bigger, pulsing ring, stronger glow
+  G.items.forEach(it=>{
+    if(it.collected)return;
+    const sx=it.x-camX,sy=it.y-camY;
+    if(sx<-60||sx>W+60||sy<-60||sy>H+60)return;
+    const def=COLLECT_DEF[it.id];
+    const bob=Math.sin(it.wobble)*5;
+    ctx.save();
+    if(def.main){
+      // Stars: strong pulsing glow, bigger — no stroke (causes artifacts)
+      const pulse=18+Math.sin(it.wobble*2)*10;
+      ctx.shadowColor='rgba(255,215,0,1)';
+      ctx.shadowBlur=pulse;
+      ctx.font=(def.size+10)+'px serif';
+    } else {
+      ctx.shadowColor=def.glow;
+      ctx.shadowBlur=10;
+      ctx.font=def.size+'px serif';
+    }
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(def.emoji,sx,sy+bob);
+    ctx.restore();
+  });
+
+  // Bubbles
+  G.bubbles.forEach(b=>{
+    const sx=b.x-camX,sy=b.y-camY;
+    if(sx<-20||sx>W+20||sy<-20||sy>H+20)return;
+    const alpha=Math.min(.38,b.life/70*.38);
+    ctx.save();ctx.globalAlpha=alpha;
+    ctx.beginPath();ctx.arc(sx,sy,b.r,0,Math.PI*2);
+    ctx.fillStyle='rgba(180,220,255,.35)';ctx.fill();
+    // tiny highlight only — no stroke
+    ctx.globalAlpha=alpha*1.4;
+    ctx.beginPath();ctx.arc(sx-b.r*.3,sy-b.r*.3,b.r*.18,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,.6)';ctx.fill();
+    ctx.restore();
+  });
+
+  // Power effects
+  if(G.activePower==='p_shield'&&G.powerTimer>0){
+    ctx.save();ctx.globalAlpha=.25+Math.sin(G.tick*.14)*.1;ctx.strokeStyle='#7ee8ff';ctx.lineWidth=5;ctx.shadowColor='#23a6d5';ctx.shadowBlur=22;
+    ctx.beginPath();ctx.arc(W/2,H/2,78,0,Math.PI*2);ctx.stroke();
+    for(let i=0;i<8;i++){const a=i/8*Math.PI*2+G.tick*.03;ctx.beginPath();ctx.arc(W/2+Math.cos(a)*72,H/2+Math.sin(a)*72,5,0,Math.PI*2);ctx.fillStyle='rgba(126,232,255,.5)';ctx.fill();}
+    ctx.restore();
+  }
+  if(G.activePower==='p_glow'&&G.powerTimer>0){
+    ctx.save();ctx.globalAlpha=.12+Math.sin(G.tick*.18)*.05;
+    const rg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,130);rg.addColorStop(0,'#ffd700');rg.addColorStop(1,'transparent');
+    ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);ctx.restore();
+  }
+  if(G.activePower==='p_speed'&&G.powerTimer>0&&Math.sqrt(G.vx*G.vx+G.vy*G.vy)>1){
+    ctx.save();ctx.globalAlpha=.09;
+    for(let i=1;i<=4;i++){ctx.save();ctx.translate(W/2-Math.cos(G.angle)*i*14,H/2-Math.sin(G.angle)*i*14);ctx.rotate(G.angle);drawWhale(ctx,0,0,1,'#23a6d5','#7ee8ff');ctx.restore();}
+    ctx.restore();
+  }
+
+  // WHALE
+  let bc=G.bodyColor,be=G.bellyColor;
+  if(G.specialColor==='rainbow'){bc=getRainbow(G.rainbowT);be=getRainbow(G.rainbowT+1.5);}
+  if(G.specialColor==='galaxy'){bc=`hsl(${(G.tick*.9)%360},70%,30%)`;be=`hsl(${(G.tick*.9+60)%360},60%,60%)`;}
+  if(G.specialColor==='lava'){bc=`hsl(${10+Math.sin(G.tick*.05)*10|0},90%,${35+Math.sin(G.tick*.08)*8|0}%)`;be=`hsl(25,100%,60%)`;}
+  if(G.specialColor==='ice'){bc=`hsl(${195+Math.sin(G.tick*.04)*8|0},60%,${70+Math.sin(G.tick*.06)*8|0}%)`;be='#ffffff';}
+  ctx.save();ctx.translate(W/2,H/2);ctx.rotate(G.angle);
+  drawWhale(ctx,0,0,1,bc,be);ctx.restore();
+
+  // Star burst toasts
+  G.starBursts.forEach(s=>{
+    const sx=s.wx-camX,sy=s.wy-camY;
+    if(sx<-60||sx>W+60||sy<-60||sy>H+60)return;
+    const a=s.life/s.ml;
+    ctx.save();ctx.globalAlpha=a;
+    if(s.trail){
+      // Trail particles — emoji, no rise, just fade
+      ctx.font='18px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(s.txt,sx,sy);
+    } else {
+      const rise=35*(1-a);
+      ctx.font=`bold ${s.big?30:22}px Bubblegum Sans,cursive`;
+      ctx.fillStyle='#ffd700';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.shadowColor='rgba(255,215,0,.7)';ctx.shadowBlur=10;
+      ctx.fillText(s.txt,sx,sy-rise);
+    }
+    ctx.restore();
+  });
+
+  // Interaction prompt — large pill
+  if(G.nearNPC&&!G.dlgOpen){
+    const label=isTouchDevice()?'Tap to talk to '+G.nearNPC.name+'!':'E = Talk to '+G.nearNPC.name+'!';
+    ctx.save();
+    ctx.font='bold 22px Bubblegum Sans,cursive';
+    const tw=ctx.measureText(label).width;
+    const pw=tw+36,ph=48,px=W/2-pw/2,py=H/2-132;
+    ctx.fillStyle='rgba(2,18,44,.88)';ctx.strokeStyle='rgba(255,215,0,.8)';ctx.lineWidth=2.5;
+    rrect(ctx,px,py,pw,ph,24);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.shadowColor='#ffd700';ctx.shadowBlur=10;ctx.fillText(label,W/2,py+ph/2);
+    ctx.restore();
+  }
+
+  drawMinimap(camX,camY,W,H);
+  drawArrow(camX,camY,W,H);
+}
+
+function drawFeature(f,sx,sy){
+  ctx.save();
+  if(f.type==='chest'){
+    if(f.opened){
+      // Open chest — dim, empty
+      ctx.globalAlpha=.4;
+      ctx.font='44px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('📦',sx,sy);
+      ctx.font='12px Bubblegum Sans,cursive';ctx.fillStyle='rgba(255,255,255,.4)';
+      ctx.fillText('Empty!',sx,sy+32);
+    } else {
+      // Closed chest — glowing, bobbing
+      const bob=Math.sin((f.wobble||0))*5;
+      ctx.shadowColor='rgba(255,215,0,.7)';ctx.shadowBlur=16+Math.sin(G.tick*.06)*6;
+      ctx.font='48px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('📫',sx,sy+bob); // closed mailbox stand-in — use chest
+      // Actually draw as a chest shape
+      ctx.shadowBlur=0;ctx.globalAlpha=1;
+      // Chest body
+      ctx.fillStyle='#8B4513';ctx.fillRect(sx-22,sy+bob-12,44,28);
+      ctx.fillStyle='#A0522D';ctx.fillRect(sx-22,sy+bob-20,44,12);
+      // Gold latch
+      ctx.fillStyle='#ffd700';ctx.beginPath();ctx.arc(sx,sy+bob-6,5,0,Math.PI*2);ctx.fill();
+      // Glow via shadow on a filled rect — no stroke
+      ctx.save();ctx.shadowColor='rgba(255,215,0,.7)';ctx.shadowBlur=14+Math.sin(G.tick*.08)*6;
+      ctx.fillStyle='rgba(255,215,0,.0)';ctx.fillRect(sx-23,sy+bob-21,46,42);
+      ctx.restore();
+      ctx.font='12px Bubblegum Sans,cursive';ctx.fillStyle='rgba(255,215,0,.9)';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('Treasure!',sx,sy+bob+30);
+    }
+  } else if(f.type==='bottle'){
+    if(!f.read){
+      const bob=Math.sin((f.wobble||G.tick*.02))*4;
+      ctx.font='36px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.shadowColor='rgba(100,200,255,.7)';ctx.shadowBlur=12;
+      ctx.fillText('📜',sx,sy+bob);
+      ctx.shadowBlur=0;ctx.font='11px Bubblegum Sans,cursive';
+      ctx.fillStyle='rgba(255,255,255,.7)';ctx.fillText('Message!',sx,sy+bob+28);
+    }
+  } else if(f.type==='volcano'){
+    // Volcano landmark — draw as layered triangles
+    const erupting=(f.nextErupt||999)<60;
+    // Base
+    ctx.fillStyle='#5d4037';
+    ctx.beginPath();ctx.moveTo(sx-70,sy+50);ctx.lineTo(sx,sy-60);ctx.lineTo(sx+70,sy+50);ctx.closePath();ctx.fill();
+    // Mid layer
+    ctx.fillStyle='#4e342e';
+    ctx.beginPath();ctx.moveTo(sx-50,sy+50);ctx.lineTo(sx-5,sy-40);ctx.lineTo(sx+5,sy-40);ctx.lineTo(sx+50,sy+50);ctx.closePath();ctx.fill();
+    // Crater
+    ctx.fillStyle='#bf360c';
+    ctx.beginPath();ctx.ellipse(sx,sy-55,18,8,0,0,Math.PI*2);ctx.fill();
+    if(erupting){
+      ctx.shadowColor='rgba(255,100,0,.9)';ctx.shadowBlur=20;
+      ctx.fillStyle='#ff5722';
+      ctx.beginPath();ctx.ellipse(sx,sy-60,12,18,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#ff9800';
+      ctx.beginPath();ctx.ellipse(sx-5,sy-72,7,12,-.3,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.ellipse(sx+5,sy-74,6,10,.3,0,Math.PI*2);ctx.fill();
+    }
+    ctx.shadowBlur=0;
+    ctx.font='12px Bubblegum Sans,cursive';ctx.fillStyle='rgba(255,150,50,.9)';
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🌋 Volcano!',sx,sy+65);
+  } else if(f.type==='ship'){
+    // Sunken ship
+    ctx.globalAlpha=.85;
+    // Hull
+    ctx.fillStyle='#4a2f24';
+    ctx.beginPath();ctx.moveTo(sx-60,sy+10);ctx.lineTo(sx-70,sy+30);ctx.lineTo(sx+70,sy+30);ctx.lineTo(sx+60,sy+10);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#5d3a28';ctx.fillRect(sx-50,sy-20,100,32);
+    // Mast
+    ctx.fillStyle='#6d4c41';ctx.fillRect(sx-4,sy-70,8,55);
+    ctx.fillStyle='rgba(255,255,255,.15)';ctx.fillRect(sx,sy-68,35,20); // sail remnant
+    // Portholes
+    ctx.fillStyle='rgba(100,180,255,.25)';
+    [sx-30,sx,sx+30].forEach(px=>{ctx.beginPath();ctx.arc(px,sy+5,6,0,Math.PI*2);ctx.fill();});
+    ctx.shadowBlur=0;ctx.font='13px Bubblegum Sans,cursive';
+    ctx.fillStyle='rgba(255,255,255,.65)';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('🚢 Sunken Ship',sx,sy+46);
+  } else if(f.type==='reef'){
+    // Coral reef arch
+    const cols=['#e74c3c','#f39c12','#e91e63','#ff5722','#ff9800'];
+    [-40,-20,0,20,40].forEach((ox,i)=>{
+      ctx.fillStyle=cols[i];
+      const h=40+Math.sin(i*1.4)*20;
+      ctx.beginPath();ctx.ellipse(sx+ox,sy+20,8,h,0,0,Math.PI*2);ctx.fill();
+      // Coral tips
+      ctx.beginPath();ctx.arc(sx+ox,sy+20-h,10,0,Math.PI*2);ctx.fill();
+    });
+    ctx.font='13px Bubblegum Sans,cursive';ctx.fillStyle='rgba(255,255,255,.75)';
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🪸 Coral Reef',sx,sy+45);
+  } else if(f.type==='kelp'){
+    // Kelp forest — tall filled shapes
+    [-25,-10,5,20,-38].forEach((ox,i)=>{
+      const h=60+i*8;
+      ctx.fillStyle=`hsl(${140+i*8},55%,${26+i*3}%)`;
+      ctx.beginPath();ctx.ellipse(sx+ox+Math.sin(G.tick*.02+i)*4,sy-h/2,7,h/2,.1*(i%2?1:-1),0,Math.PI*2);ctx.fill();
+    });
+    ctx.font='13px Bubblegum Sans,cursive';ctx.fillStyle='rgba(150,255,150,.7)';
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🌿 Kelp Forest',sx,sy+40);
+  } else if(f.type==='ice'){
+    // Ice cavern entrance
+    ctx.fillStyle='rgba(168,216,240,.7)';
+    ctx.beginPath();ctx.ellipse(sx,sy+10,55,35,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(200,240,255,.5)';
+    ctx.beginPath();ctx.ellipse(sx,sy+10,38,22,0,0,Math.PI*2);ctx.fill();
+    // Icicles
+    [-30,-15,0,15,30].forEach((ox,i)=>{
+      const h=15+i%3*8;
+      ctx.fillStyle='rgba(200,240,255,.8)';
+      ctx.beginPath();ctx.moveTo(sx+ox-5,sy-18);ctx.lineTo(sx+ox+5,sy-18);ctx.lineTo(sx+ox,sy-18+h);ctx.closePath();ctx.fill();
+    });
+    ctx.font='13px Bubblegum Sans,cursive';ctx.fillStyle='rgba(200,240,255,.8)';
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🧊 Ice Cavern',sx,sy+50);
+  }
+  ctx.restore();
+}
+
+function drawHome(sx,sy){
+  const rg=ctx.createRadialGradient(sx,sy,0,sx,sy,80);
+  rg.addColorStop(0,'rgba(255,215,0,.22)');rg.addColorStop(1,'transparent');
+  ctx.fillStyle=rg;ctx.fillRect(sx-80,sy-80,160,160);
+  ctx.fillStyle='#2c3e50';ctx.beginPath();ctx.arc(sx,sy+8,46,Math.PI,0);ctx.lineTo(sx+46,sy+36);ctx.lineTo(sx-46,sy+36);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#34495e';ctx.beginPath();ctx.arc(sx,sy+8,38,Math.PI,0);ctx.closePath();ctx.fill();
+  const ig=ctx.createRadialGradient(sx,sy+8,0,sx,sy+8,34);ig.addColorStop(0,'rgba(255,160,40,.3)');ig.addColorStop(1,'rgba(10,30,60,.8)');
+  ctx.fillStyle=ig;ctx.beginPath();ctx.arc(sx,sy+8,34,Math.PI,0);ctx.closePath();ctx.fill();
+  const cols=['#e74c3c','#f39c12','#2ecc71','#23a6d5','#9b59b6'];
+  cols.forEach((col,i)=>{const gx=sx-28+i*14,gy=sy+6;ctx.save();ctx.globalAlpha=.6+Math.sin(G.tick*.08+i)*.35;ctx.beginPath();ctx.arc(gx,gy,3.5,0,Math.PI*2);ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=8;ctx.fill();ctx.restore();});
+  ctx.font='bold 15px Bubblegum Sans,cursive';ctx.fillStyle='rgba(255,215,0,.9)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(255,215,0,.5)';ctx.shadowBlur=8;ctx.fillText('Your Cave!',sx,sy+52);ctx.shadowBlur=0;
+}
+
+function drawBadge(sx,sy,txt,color){
+  ctx.save();ctx.translate(sx,sy+Math.sin(G.tick*.1)*5);
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(0,0,17,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font='bold 20px Fredoka One,sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,0,1);
+  ctx.restore();
+}
+
+function drawMinimap(camX,camY,W,H){
+  const mw=130,mh=130,mx=W-mw-10,my=H-mh-10,sc=mw/WORLD;
+  ctx.save();ctx.globalAlpha=.9;ctx.fillStyle='rgba(2,18,44,.84)';ctx.strokeStyle='rgba(35,166,213,.5)';ctx.lineWidth=2;
+  rrect(ctx,mx,my,mw,mh,10);ctx.fill();ctx.stroke();
+  ctx.globalAlpha=.55;
+  G.items.forEach(it=>{
+    if(it.collected)return;
+    const def=COLLECT_DEF[it.id];
+    ctx.fillStyle=def.main?'#ffd700':'rgba(255,255,255,.4)';
+    ctx.beginPath();ctx.arc(mx+it.x*sc,my+it.y*sc,def.main?2.8:1.2,0,Math.PI*2);ctx.fill();
+  });
+  ctx.globalAlpha=.85;
+  G.npcs.forEach(npc=>{ctx.fillStyle=npc.color;ctx.beginPath();ctx.arc(mx+npc.x*sc,my+npc.y*sc,3.5,0,Math.PI*2);ctx.fill();});
+  // Features on minimap
+  if(G.features) G.features.forEach(f=>{
+    if((f.type==='chest'&&f.opened)||(f.type==='bottle'&&f.read))return;
+    ctx.fillStyle=f.type==='chest'?'#ffd700':f.type==='bottle'?'#a0d8ef':f.type==='volcano'?'#ff5722':'rgba(100,200,255,.5)';
+    ctx.beginPath();ctx.arc(mx+f.x*sc,my+f.y*sc,f.type==='chest'?3:2,0,Math.PI*2);ctx.fill();
+  });
+  ctx.globalAlpha=1;ctx.fillStyle='#ffd700';ctx.strokeStyle='#fff';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(mx+G.homeX*sc,my+G.homeY*sc,5,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#7ee8ff';ctx.beginPath();ctx.arc(mx+G.x*sc,my+G.y*sc,5.5,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,.18)';ctx.lineWidth=1;ctx.strokeRect(mx+camX*sc,my+camY*sc,W*sc,H*sc);
+  ctx.restore();
+}
+
+function drawArrow(camX,camY,W,H){
+  let nearest=null,nd=Infinity;
+  if(G.quest&&G.questProg<G.quest.qt.count){
+    G.items.forEach(it=>{if(it.collected||it.id!==G.quest.qt.target)return;const d=(it.x-G.x)**2+(it.y-G.y)**2;if(d<nd){nd=d;nearest=it;}});
+  }
+  if(!nearest)G.items.forEach(it=>{if(it.collected)return;const d=(it.x-G.x)**2+(it.y-G.y)**2;if(d<nd){nd=d;nearest=it;}});
+  if(!nearest||nd<180*180)return;
+  const sx=nearest.x-camX,sy=nearest.y-camY;
+  if(sx>0&&sx<W&&sy>0&&sy<H)return;
+  const a=Math.atan2(nearest.y-G.y,nearest.x-G.x);
+  const ex=W/2+Math.cos(a)*(W/2-40),ey=H/2+Math.sin(a)*(H/2-74);
+  ctx.save();ctx.translate(ex,ey);ctx.rotate(a);ctx.fillStyle='rgba(255,215,0,.9)';ctx.beginPath();ctx.moveTo(24,0);ctx.lineTo(-10,-9);ctx.lineTo(-10,9);ctx.closePath();ctx.fill();ctx.restore();
+  const def=COLLECT_DEF[nearest.id];
+  ctx.font='18px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(def.emoji,ex,ey);
+}
+
+function rrect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();}
+
+// ════════════════ LOOP ════════════════
+function loop(){update();draw();requestAnimationFrame(loop);}
+</script>
+</body>
+</html>
