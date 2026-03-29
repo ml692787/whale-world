@@ -222,6 +222,7 @@ canvas{position:fixed;inset:0;display:block;}
     <button class="ctab on"  onclick="setCTab('whale')">🐋 Whales</button>
     <button class="ctab"     onclick="setCTab('color')">🎨 Colors</button>
     <button class="ctab"     onclick="setCTab('acc')">🎩 Hats</button>
+    <button class="ctab"     onclick="setCTab('trail')">✨ Trails</button>
     <button class="ctab"     onclick="setCTab('power')">⚡ Powers</button>
   </div>
   <div class="cgrid" id="cgrid"></div>
@@ -292,38 +293,84 @@ const COLLECT_DEF={
 const SPAWN_IDS=['star','star','star','star','diamond','shell','pearl','orb','fish','coral','krill','jellyfish'];
 
 const WHALE_TYPES={
-  blue:    {name:'Blue Whale', emoji:'🐋',body:'#1a6aad',belly:'#a8d8f0',fin:'#1560a0',horn:false,cost:0,  desc:'The biggest animal ever!'},
-  humpback:{name:'Humpback',   emoji:'🐋',body:'#2c3e50',belly:'#bdc3c7',fin:'#1a252f',horn:false,cost:20, desc:'Amazing singer of the sea!'},
-  orca:    {name:'Orca',       emoji:'🐋',body:'#111111',belly:'#f0f0f0',fin:'#000',   horn:false,cost:30, desc:'Super smart ocean hunter!'},
-  narwhal: {name:'Narwhal',    emoji:'🦄',body:'#7b9eb5',belly:'#d6eaf8',fin:'#5a7f9a',horn:true, cost:40, desc:'The unicorn of the sea!'},
-  beluga:  {name:'Beluga',     emoji:'⚪',body:'#f0f4f8',belly:'#ffffff',fin:'#d0dce8',horn:false,cost:25, desc:'White and very funny!'},
+  blue:    {name:'Blue Whale',  emoji:'🐋',body:'#1a6aad',belly:'#a8d8f0',fin:'#1560a0',horn:false,cost:0,  desc:'The biggest animal ever!'},
+  humpback:{name:'Humpback',    emoji:'🐋',body:'#2c3e50',belly:'#bdc3c7',fin:'#1a252f',horn:false,cost:20, desc:'Amazing singer of the sea!'},
+  beluga:  {name:'Beluga',      emoji:'⚪',body:'#f0f4f8',belly:'#ffffff', fin:'#d0dce8',horn:false,cost:25, desc:'White and very funny!'},
+  orca:    {name:'Orca',        emoji:'🐋',body:'#111111',belly:'#f0f0f0', fin:'#000',   horn:false,cost:30, desc:'Super smart ocean hunter!'},
+  sperm:   {name:'Sperm Whale', emoji:'🐋',body:'#5d4037',belly:'#c4956a', fin:'#4a2f24',horn:false,cost:35, desc:'Deep diving champion!'},
+  narwhal: {name:'Narwhal',     emoji:'🦄',body:'#7b9eb5',belly:'#d6eaf8', fin:'#5a7f9a',horn:true, cost:40, desc:'The unicorn of the sea!'},
+  fin:     {name:'Fin Whale',   emoji:'🐋',body:'#3a3a4a',belly:'#e8e8d0', fin:'#2a2a3a',horn:false,cost:45, desc:'Second biggest whale!'},
+  pilot:   {name:'Pilot Whale', emoji:'🐋',body:'#1a1a2e',belly:'#4a6080', fin:'#111122',horn:false,cost:50, desc:'Leads the whole pod!'},
 };
 
 const COLORS=[
-  {id:'c_lime',   emoji:'🟢',name:'Lime Green',   cost:8,  body:'#2ecc71',belly:'#a8ffcc'},
-  {id:'c_pink',   emoji:'🩷',name:'Cotton Candy', cost:8,  body:'#ff69b4',belly:'#ffcce5'},
-  {id:'c_gold',   emoji:'🟡',name:'Golden',       cost:15, body:'#f39c12',belly:'#fff3c0'},
-  {id:'c_purple', emoji:'🟣',name:'Purple',       cost:12, body:'#8e44ad',belly:'#e8d5ff'},
-  {id:'c_red',    emoji:'🔴',name:'Fire Red',     cost:10, body:'#e74c3c',belly:'#ffc0bb'},
-  {id:'c_ocean',  emoji:'🌊',name:'Deep Ocean',   cost:10, body:'#006994',belly:'#b3ecff'},
-  {id:'c_galaxy', emoji:'🌌',name:'Galaxy',       cost:25, body:'#1a0050',belly:'#6a0dad',special:'galaxy'},
-  {id:'c_rainbow',emoji:'🌈',name:'Rainbow!',     cost:35, body:'#ff69b4',belly:'#a8f0ff',special:'rainbow'},
+  // Basic colors
+  {id:'c_lime',    emoji:'🟢',name:'Lime Green',    cost:8,  body:'#2ecc71',belly:'#a8ffcc'},
+  {id:'c_pink',    emoji:'🩷',name:'Cotton Candy',  cost:8,  body:'#ff69b4',belly:'#ffcce5'},
+  {id:'c_red',     emoji:'🔴',name:'Fire Red',      cost:10, body:'#e74c3c',belly:'#ffc0bb'},
+  {id:'c_orange',  emoji:'🟠',name:'Sunny Orange',  cost:10, body:'#e67e22',belly:'#fde8c8'},
+  {id:'c_purple',  emoji:'🟣',name:'Purple',        cost:12, body:'#8e44ad',belly:'#e8d5ff'},
+  {id:'c_teal',    emoji:'🩵',name:'Sea Teal',      cost:10, body:'#16a085',belly:'#a8e6d8'},
+  {id:'c_ocean',   emoji:'🌊',name:'Deep Ocean',    cost:10, body:'#006994',belly:'#b3ecff'},
+  {id:'c_mint',    emoji:'💚',name:'Minty Fresh',   cost:8,  body:'#00b894',belly:'#c8fff4'},
+  // Special patterns
+  {id:'c_gold',    emoji:'🟡',name:'Golden',        cost:15, body:'#f39c12',belly:'#fff3c0'},
+  {id:'c_silver',  emoji:'🩶',name:'Silver',        cost:15, body:'#95a5a6',belly:'#ecf0f1'},
+  {id:'c_lavender',emoji:'💜',name:'Lavender',      cost:12, body:'#9b59b6',belly:'#f5e6ff'},
+  {id:'c_rose',    emoji:'🌹',name:'Rose Gold',     cost:18, body:'#c0392b',belly:'#ffdde1'},
+  {id:'c_sky',     emoji:'☁️', name:'Sky Blue',     cost:12, body:'#3498db',belly:'#d6eaf8'},
+  {id:'c_night',   emoji:'🌙',name:'Midnight',      cost:20, body:'#1a1a2e',belly:'#16213e'},
+  {id:'c_tropical',emoji:'🌴',name:'Tropical',     cost:20, body:'#00b4d8',belly:'#ade8f4'},
+  {id:'c_bubblegum',emoji:'🍬',name:'Bubblegum',   cost:18, body:'#fd79a8',belly:'#ffeaa7'},
+  // Magic colors
+  {id:'c_galaxy',  emoji:'🌌',name:'Galaxy',        cost:25, body:'#1a0050',belly:'#6a0dad',special:'galaxy'},
+  {id:'c_lava',    emoji:'🌋',name:'Lava',          cost:28, body:'#c0392b',belly:'#e74c3c',special:'lava'},
+  {id:'c_ice',     emoji:'🧊',name:'Icy',           cost:28, body:'#a8d8f0',belly:'#ffffff',special:'ice'},
+  {id:'c_rainbow', emoji:'🌈',name:'Rainbow!',      cost:35, body:'#ff69b4',belly:'#a8f0ff',special:'rainbow'},
 ];
+
 const ACCS=[
-  {id:'a_crown',  emoji:'👑',name:'Crown',      cost:10},
-  {id:'a_hat',    emoji:'🎩',name:'Top Hat',    cost:8},
-  {id:'a_bow',    emoji:'🎀',name:'Bow',        cost:6},
-  {id:'a_glasses',emoji:'🕶️',name:'Cool Shades',cost:7},
-  {id:'a_flower', emoji:'🌸',name:'Flower',     cost:8},
-  {id:'a_halo',   emoji:'😇',name:'Halo',       cost:18},
-  {id:'a_party',  emoji:'🎉',name:'Party Hat',  cost:9},
-  {id:'a_magic',  emoji:'🔮',name:'Magic Orb',  cost:20},
+  // Hats
+  {id:'a_crown',   emoji:'👑',name:'Crown',         cost:10},
+  {id:'a_hat',     emoji:'🎩',name:'Top Hat',       cost:8},
+  {id:'a_party',   emoji:'🎉',name:'Party Hat',     cost:9},
+  {id:'a_witch',   emoji:'🧙',name:'Witch Hat',     cost:12},
+  {id:'a_cowboy',  emoji:'🤠',name:'Cowboy Hat',    cost:12},
+  {id:'a_tiara',   emoji:'✨',name:'Tiara',         cost:15},
+  {id:'a_propeller',emoji:'🚁',name:'Propeller Hat',cost:14},
+  {id:'a_pirate',  emoji:'🏴‍☠️',name:'Pirate Hat',  cost:16},
+  // Face
+  {id:'a_glasses', emoji:'🕶️',name:'Cool Shades',  cost:7},
+  {id:'a_goggles', emoji:'🥽',name:'Goggles',       cost:10},
+  {id:'a_monocle', emoji:'🧐',name:'Monocle',       cost:12},
+  // Body
+  {id:'a_bow',     emoji:'🎀',name:'Bow',           cost:6},
+  {id:'a_flower',  emoji:'🌸',name:'Flower',        cost:8},
+  {id:'a_halo',    emoji:'😇',name:'Halo',          cost:18},
+  {id:'a_magic',   emoji:'🔮',name:'Magic Orb',     cost:20},
+  {id:'a_anchor',  emoji:'⚓',name:'Anchor',        cost:14},
+  {id:'a_heart',   emoji:'❤️',name:'Heart',         cost:8},
+  {id:'a_rainbow', emoji:'🌈',name:'Rainbow Fin',   cost:22},
+  {id:'a_cape',    emoji:'🦸',name:'Hero Cape',     cost:25},
+  {id:'a_wings',   emoji:'🦋',name:'Fairy Wings',   cost:28},
 ];
+
 const POWERS=[
-  {id:'p_speed', emoji:'⚡',name:'Go Fast!',       cost:20,key:'1',desc:'Swim super fast!'},
-  {id:'p_magnet',emoji:'🧲',name:'Star Magnet!',   cost:25,key:'2',desc:'Stars fly to you!'},
-  {id:'p_shield',emoji:'🛡️',name:'Bubble Shield!', cost:30,key:'3',desc:'Bubble armor!'},
-  {id:'p_glow',  emoji:'✨',name:'Star Glow!',     cost:20,key:'4',desc:'Glow super bright!'},
+  {id:'p_speed',  emoji:'⚡',name:'Go Fast!',        cost:20,key:'1',desc:'Swim super fast!'},
+  {id:'p_magnet', emoji:'🧲',name:'Star Magnet!',    cost:25,key:'2',desc:'Stars fly to you!'},
+  {id:'p_shield', emoji:'🛡️',name:'Bubble Shield!',  cost:30,key:'3',desc:'Bubble armor!'},
+  {id:'p_glow',   emoji:'✨',name:'Star Glow!',      cost:20,key:'4',desc:'Glow super bright!'},
+  {id:'p_tiny',   emoji:'🤏',name:'Tiny Mode!',      cost:22,key:'5',desc:'Shrink super small!'},
+  {id:'p_cannon', emoji:'💨',name:'Bubble Cannon!',  cost:28,key:'6',desc:'Shoot bubbles everywhere!'},
+  {id:'p_dash',   emoji:'💨',name:'Super Dash!',     cost:35,key:'7',desc:'Teleport forward!'},
+];
+
+const TRAILS=[
+  {id:'t_bubbles',emoji:'🫧',name:'Bubble Trail',   cost:15,desc:'Leave bubbles as you swim!'},
+  {id:'t_stars',  emoji:'⭐',name:'Star Trail',      cost:20,desc:'Sprinkle stars everywhere!'},
+  {id:'t_rainbow',emoji:'🌈',name:'Rainbow Trail',   cost:30,desc:'Paint rainbows in the sea!'},
+  {id:'t_hearts', emoji:'❤️',name:'Heart Trail',    cost:18,desc:'Leave a trail of love!'},
+  {id:'t_sparkle',emoji:'💫',name:'Sparkle Trail',  cost:25,desc:'Shimmer as you swim!'},
 ];
 
 // ════════════════ STATE ════════════════
@@ -332,11 +379,11 @@ const G={
   specialColor:null,rainbowT:0,
   equippedColor:null,equippedAccs:new Set(),
   ownedWhales:new Set(['blue']),ownedColors:new Set(),
-  ownedAccs:new Set(),ownedPowers:{},
+  ownedAccs:new Set(),ownedPowers:{},ownedTrails:new Set(),equippedTrail:null,
   stars:0,level:1,xp:0,xpNext:20,
   x:1600,y:1600,vx:0,vy:0,angle:0,
   homeX:1600,homeY:1560,
-  items:[],npcs:[],decor:[],
+  items:[],npcs:[],decor:[],features:[],
   bubbles:[],starBursts:[],
   tick:0,
   activePower:null,powerTimer:0,
@@ -421,6 +468,8 @@ function renderDressPreview(){
   let bc=G.bodyColor,be=G.bellyColor;
   if(G.specialColor==='rainbow'){bc=getRainbow(G.rainbowT);be=getRainbow(G.rainbowT+1.5);}
   if(G.specialColor==='galaxy'){bc=`hsl(${(G.tick*.8)%360},70%,30%)`;be=`hsl(${(G.tick*.8+60)%360},60%,60%)`;}
+  if(G.specialColor==='lava'){bc=`hsl(${10+Math.sin(G.tick*.05)*10|0},90%,${35+Math.sin(G.tick*.08)*8|0}%)`;be='hsl(25,100%,60%)';}
+  if(G.specialColor==='ice'){bc=`hsl(${195+Math.sin(G.tick*.04)*8|0},60%,${70+Math.sin(G.tick*.06)*8|0}%)`;be='#ffffff';}
   drawWhale(dCtx,100,74,.82,bc,be);
   document.getElementById('d-wname').textContent=WHALE_TYPES[G.whaleType].name;
 }
@@ -472,12 +521,53 @@ function initWorld(){
       collected:false,wobble:Math.random()*Math.PI*2,ws:.022+Math.random()*.03,
       size:def.size,main:def.main});
   }
+
+  // Decor — rocks and weeds, fill-only
   G.decor=[];
-  const types=['rock','weed'];
-  for(let i=0;i<80;i++) G.decor.push({type:types[i%2],x:60+Math.random()*(WORLD-120),y:60+Math.random()*(WORLD-120),s:.6+Math.random()*.8,seed:Math.random()*100});
-  G.npcs=NPC_DEFS.map((def,i)=>{
-    const a=(i/NPC_DEFS.length)*Math.PI*2,r=480+Math.random()*300;
-    return{...def,x:G.homeX+Math.cos(a)*r,y:G.homeY+Math.sin(a)*r,wobble:Math.random()*Math.PI*2,questGiven:false};
+  const dtypes=['rock','weed'];
+  for(let i=0;i<100;i++) G.decor.push({type:dtypes[i%2],x:60+Math.random()*(WORLD-120),y:60+Math.random()*(WORLD-120),s:.6+Math.random()*.8,seed:Math.random()*100});
+
+  // World features — special interactive/visual elements
+  G.features=[
+    // Treasure chests — burst with items when touched
+    ...Array(8).fill(0).map((_,i)=>({
+      type:'chest',id:'chest_'+i,
+      x:200+Math.random()*(WORLD-400),y:200+Math.random()*(WORLD-400),
+      opened:false,wobble:Math.random()*Math.PI*2
+    })),
+    // Message bottles — give whale facts
+    ...Array(6).fill(0).map((_,i)=>({
+      type:'bottle',id:'bottle_'+i,
+      x:200+Math.random()*(WORLD-400),y:200+Math.random()*(WORLD-400),
+      read:false,wobble:Math.random()*Math.PI*2,
+      factIdx:i%FACTS.length
+    })),
+    // Volcano — visual landmark, spits collectibles periodically
+    {type:'volcano',id:'volcano_0',x:400,y:400,nextErupt:300+Math.random()*400},
+    // Sunken ship — near Dolly's zone
+    {type:'ship',id:'ship_0',x:400,y:2800},
+    // Coral reef arch — near Terry's zone
+    {type:'reef',id:'reef_0',x:2800,y:400},
+    // Kelp forest — near Jelly's zone
+    {type:'kelp',id:'kelp_0',x:400,y:2400},
+    // Ice cavern — near the narwhal area
+    {type:'ice',id:'ice_0',x:2800,y:2800},
+  ];
+
+  // NPCs in THEMED ZONES — each has a unique home far from spawn
+  // Terry → Coral Reef (top-right)
+  // Dolly → Sunken Ship (bottom-left)
+  // Crabby → Sandy Floor (bottom-right)
+  // Jelly → Deep Dark Zone (top-left, deep)
+  const npcPositions={
+    terry:  {x:2700,y:500,  zone:'🪸 Coral Reef'},
+    dolly:  {x:500, y:2700, zone:'🚢 Sunken Ship'},
+    crabby: {x:2700,y:2700, zone:'🏖️ Sandy Floor'},
+    jellie: {x:500, y:500,  zone:'🌑 Deep Zone'},
+  };
+  G.npcs=NPC_DEFS.map(def=>{
+    const pos=npcPositions[def.id]||{x:1600,y:1600,zone:''};
+    return{...def,...pos,wobble:Math.random()*Math.PI*2,questGiven:false};
   });
   updateQHUD();
 }
@@ -496,7 +586,7 @@ function closeCave(){
 }
 function setCTab(t){
   cTab=t;
-  document.querySelectorAll('.ctab').forEach((el,i)=>el.classList.toggle('on',['whale','color','acc','power'][i]===t));
+  document.querySelectorAll('.ctab').forEach((el,i)=>el.classList.toggle('on',['whale','color','acc','trail','power'][i]===t));
   renderCave();
 }
 function renderCave(){
@@ -519,6 +609,12 @@ function renderCave(){
       const owned=G.ownedAccs.has(a.id),on=G.equippedAccs.has(a.id);
       const d=mkCI(a.emoji,a.name,owned?(on?'✅ On!':'Tap to toggle'):'⭐ '+a.cost,on?'equipped':owned?'owned':'','');
       d.onclick=()=>buyAcc(a);grid.appendChild(d);
+    });
+  } else if(cTab==='trail'){
+    TRAILS.forEach(t=>{
+      const owned=G.ownedTrails.has(t.id),on=G.equippedTrail===t.id;
+      const d=mkCI(t.emoji,t.name,owned?(on?'✅ On!':'Tap to use'):'⭐ '+t.cost,on?'equipped':owned?'owned':'',t.desc);
+      d.onclick=()=>buyTrail(t);grid.appendChild(d);
     });
   } else {
     POWERS.forEach(p=>{
@@ -574,6 +670,15 @@ function buyPower(p){
     showFact({e:p.emoji,ttl:'New Power!',t:'You got: '+p.name+'! '+p.desc});
   }
   updateHUD();renderCave();buildTPowers();
+}
+function buyTrail(t){
+  if(!G.ownedTrails.has(t.id)){
+    if(G.stars<t.cost){cantAfford();return;}
+    G.stars-=t.cost;G.ownedTrails.add(t.id);
+    spawnSparkles(window.innerWidth/2,window.innerHeight/2,6);
+  }
+  G.equippedTrail=G.equippedTrail===t.id?null:t.id;
+  updateHUD();renderCave();
 }
 
 // ════════════════ DIALOGUE ════════════════
@@ -818,8 +923,55 @@ function update(){
     }
   });
 
-  // NPC proximity — large, forgiving radius
-  G.nearNPC=null;
+  // Trail effect
+  if(G.equippedTrail&&Math.sqrt(G.vx*G.vx+G.vy*G.vy)>.8&&G.tick%8===0){
+    const te={bubbles:'🫧',stars:'⭐',rainbow:'🌈',hearts:'❤️',sparkle:'💫'}[G.equippedTrail.replace('t_','')]||'✨';
+    G.starBursts.push({wx:G.x+(Math.random()-.5)*20,wy:G.y+(Math.random()-.5)*20,txt:te,life:30,ml:30,big:false,trail:true});
+  }
+
+  // World features interaction
+  if(G.features) G.features.forEach(f=>{
+    if(f.opened||f.read)return;
+    const dx=f.x-G.x,dy=f.y-G.y;
+    if(dx*dx+dy*dy<70*70){
+      if(f.type==='chest'&&!f.opened){
+        f.opened=true;
+        // burst 6 random items
+        for(let i=0;i<6;i++){
+          const id=SPAWN_IDS[Math.floor(Math.random()*SPAWN_IDS.length)];
+          const def=COLLECT_DEF[id];
+          G.items.push({id,iid:9000+Math.random()*9000|0,
+            x:f.x+(Math.random()-.5)*80,y:f.y+(Math.random()-.5)*80,
+            collected:false,wobble:Math.random()*Math.PI*2,ws:.025,
+            size:def.size,main:def.main});
+        }
+        spawnSparkles(gc.width/2,gc.height/2,10);
+        showFact({e:'🎁',ttl:'Treasure!',t:'You found a treasure chest! Stars and gems flew out!'});
+      }
+      if(f.type==='bottle'&&!f.read){
+        f.read=true;
+        showFact(FACTS[f.factIdx%FACTS.length]);
+      }
+    }
+    // Volcano eruption
+    if(f.type==='volcano'){
+      f.wobble=(f.wobble||0)+.02;
+      f.nextErupt=(f.nextErupt||300)-1;
+      if(f.nextErupt<=0){
+        f.nextErupt=400+Math.random()*600;
+        // spawn collectibles around volcano
+        for(let i=0;i<4;i++){
+          const id=SPAWN_IDS[Math.floor(Math.random()*SPAWN_IDS.length)];
+          const def=COLLECT_DEF[id];
+          const a=Math.random()*Math.PI*2,r=60+Math.random()*100;
+          G.items.push({id,iid:9000+Math.random()*9000|0,
+            x:f.x+Math.cos(a)*r,y:f.y+Math.sin(a)*r,
+            collected:false,wobble:Math.random()*Math.PI*2,ws:.025,
+            size:def.size,main:def.main});
+        }
+      }
+    }
+  });
   G.npcs.forEach(npc=>{const dx=npc.x-G.x,dy=npc.y-G.y;if(dx*dx+dy*dy<170*170)G.nearNPC=npc;});
 
   const hint=document.getElementById('hud-hint');
@@ -925,13 +1077,27 @@ function draw(){
   // Home cave
   drawHome(G.homeX-camX,G.homeY-camY);
 
-  // NPCs
+  // World features
+  if(G.features) G.features.forEach(f=>{
+    const sx=f.x-camX,sy=f.y-camY;
+    if(sx<-160||sx>W+160||sy<-160||sy>H+160)return;
+    drawFeature(f,sx,sy);
+  });
+
+  // NPCs — draw zone label behind them
   G.npcs.forEach(npc=>{
     const sx=npc.x-camX,sy=npc.y-camY;
     if(sx<-90||sx>W+90||sy<-90||sy>H+90)return;
     if(G.quest&&G.questProg>=G.quest.qt.count&&G.quest.npc.id===npc.id) drawBadge(sx,sy-65,'!','#e74c3c');
     else if(!G.quest&&!npc.questGiven&&QUEST_T.some(q=>q.giver===npc.id)) drawBadge(sx,sy-65,'?','#ffd700');
     const bob=Math.sin(npc.wobble)*5;
+    // Zone label
+    if(npc.zone){
+      ctx.save();ctx.globalAlpha=.55;
+      ctx.font='13px Bubblegum Sans,cursive';ctx.fillStyle='#7ee8ff';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(npc.zone,sx,sy+bob+58);ctx.restore();
+    }
     ctx.save();ctx.shadowColor=npc.color;ctx.shadowBlur=18;
     ctx.font='54px serif';ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillText(npc.emoji,sx,sy+bob);ctx.restore();
@@ -1001,18 +1167,29 @@ function draw(){
   let bc=G.bodyColor,be=G.bellyColor;
   if(G.specialColor==='rainbow'){bc=getRainbow(G.rainbowT);be=getRainbow(G.rainbowT+1.5);}
   if(G.specialColor==='galaxy'){bc=`hsl(${(G.tick*.9)%360},70%,30%)`;be=`hsl(${(G.tick*.9+60)%360},60%,60%)`;}
+  if(G.specialColor==='lava'){bc=`hsl(${10+Math.sin(G.tick*.05)*10|0},90%,${35+Math.sin(G.tick*.08)*8|0}%)`;be=`hsl(25,100%,60%)`;}
+  if(G.specialColor==='ice'){bc=`hsl(${195+Math.sin(G.tick*.04)*8|0},60%,${70+Math.sin(G.tick*.06)*8|0}%)`;be='#ffffff';}
   ctx.save();ctx.translate(W/2,H/2);ctx.rotate(G.angle);
   drawWhale(ctx,0,0,1,bc,be);ctx.restore();
 
   // Star burst toasts
   G.starBursts.forEach(s=>{
     const sx=s.wx-camX,sy=s.wy-camY;
-    const a=s.life/s.ml,rise=35*(1-a);
+    if(sx<-60||sx>W+60||sy<-60||sy>H+60)return;
+    const a=s.life/s.ml;
     ctx.save();ctx.globalAlpha=a;
-    ctx.font=`bold ${s.big?30:22}px Bubblegum Sans,cursive`;
-    ctx.fillStyle='#ffd700';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.shadowColor='rgba(255,215,0,.7)';ctx.shadowBlur=10;
-    ctx.fillText(s.txt,sx,sy-rise);ctx.restore();
+    if(s.trail){
+      // Trail particles — emoji, no rise, just fade
+      ctx.font='18px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(s.txt,sx,sy);
+    } else {
+      const rise=35*(1-a);
+      ctx.font=`bold ${s.big?30:22}px Bubblegum Sans,cursive`;
+      ctx.fillStyle='#ffd700';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.shadowColor='rgba(255,215,0,.7)';ctx.shadowBlur=10;
+      ctx.fillText(s.txt,sx,sy-rise);
+    }
+    ctx.restore();
   });
 
   // Interaction prompt — large pill
@@ -1031,6 +1208,124 @@ function draw(){
 
   drawMinimap(camX,camY,W,H);
   drawArrow(camX,camY,W,H);
+}
+
+function drawFeature(f,sx,sy){
+  ctx.save();
+  if(f.type==='chest'){
+    if(f.opened){
+      // Open chest — dim, empty
+      ctx.globalAlpha=.4;
+      ctx.font='44px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('📦',sx,sy);
+      ctx.font='12px Bubblegum Sans,cursive';ctx.fillStyle='rgba(255,255,255,.4)';
+      ctx.fillText('Empty!',sx,sy+32);
+    } else {
+      // Closed chest — glowing, bobbing
+      const bob=Math.sin((f.wobble||0))*5;
+      ctx.shadowColor='rgba(255,215,0,.7)';ctx.shadowBlur=16+Math.sin(G.tick*.06)*6;
+      ctx.font='48px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('📫',sx,sy+bob); // closed mailbox stand-in — use chest
+      // Actually draw as a chest shape
+      ctx.shadowBlur=0;ctx.globalAlpha=1;
+      // Chest body
+      ctx.fillStyle='#8B4513';ctx.fillRect(sx-22,sy+bob-12,44,28);
+      ctx.fillStyle='#A0522D';ctx.fillRect(sx-22,sy+bob-20,44,12);
+      // Gold latch
+      ctx.fillStyle='#ffd700';ctx.beginPath();ctx.arc(sx,sy+bob-6,5,0,Math.PI*2);ctx.fill();
+      // Glow via shadow on a filled rect — no stroke
+      ctx.save();ctx.shadowColor='rgba(255,215,0,.7)';ctx.shadowBlur=14+Math.sin(G.tick*.08)*6;
+      ctx.fillStyle='rgba(255,215,0,.0)';ctx.fillRect(sx-23,sy+bob-21,46,42);
+      ctx.restore();
+      ctx.font='12px Bubblegum Sans,cursive';ctx.fillStyle='rgba(255,215,0,.9)';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('Treasure!',sx,sy+bob+30);
+    }
+  } else if(f.type==='bottle'){
+    if(!f.read){
+      const bob=Math.sin((f.wobble||G.tick*.02))*4;
+      ctx.font='36px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.shadowColor='rgba(100,200,255,.7)';ctx.shadowBlur=12;
+      ctx.fillText('📜',sx,sy+bob);
+      ctx.shadowBlur=0;ctx.font='11px Bubblegum Sans,cursive';
+      ctx.fillStyle='rgba(255,255,255,.7)';ctx.fillText('Message!',sx,sy+bob+28);
+    }
+  } else if(f.type==='volcano'){
+    // Volcano landmark — draw as layered triangles
+    const erupting=(f.nextErupt||999)<60;
+    // Base
+    ctx.fillStyle='#5d4037';
+    ctx.beginPath();ctx.moveTo(sx-70,sy+50);ctx.lineTo(sx,sy-60);ctx.lineTo(sx+70,sy+50);ctx.closePath();ctx.fill();
+    // Mid layer
+    ctx.fillStyle='#4e342e';
+    ctx.beginPath();ctx.moveTo(sx-50,sy+50);ctx.lineTo(sx-5,sy-40);ctx.lineTo(sx+5,sy-40);ctx.lineTo(sx+50,sy+50);ctx.closePath();ctx.fill();
+    // Crater
+    ctx.fillStyle='#bf360c';
+    ctx.beginPath();ctx.ellipse(sx,sy-55,18,8,0,0,Math.PI*2);ctx.fill();
+    if(erupting){
+      ctx.shadowColor='rgba(255,100,0,.9)';ctx.shadowBlur=20;
+      ctx.fillStyle='#ff5722';
+      ctx.beginPath();ctx.ellipse(sx,sy-60,12,18,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#ff9800';
+      ctx.beginPath();ctx.ellipse(sx-5,sy-72,7,12,-.3,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.ellipse(sx+5,sy-74,6,10,.3,0,Math.PI*2);ctx.fill();
+    }
+    ctx.shadowBlur=0;
+    ctx.font='12px Bubblegum Sans,cursive';ctx.fillStyle='rgba(255,150,50,.9)';
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🌋 Volcano!',sx,sy+65);
+  } else if(f.type==='ship'){
+    // Sunken ship
+    ctx.globalAlpha=.85;
+    // Hull
+    ctx.fillStyle='#4a2f24';
+    ctx.beginPath();ctx.moveTo(sx-60,sy+10);ctx.lineTo(sx-70,sy+30);ctx.lineTo(sx+70,sy+30);ctx.lineTo(sx+60,sy+10);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#5d3a28';ctx.fillRect(sx-50,sy-20,100,32);
+    // Mast
+    ctx.fillStyle='#6d4c41';ctx.fillRect(sx-4,sy-70,8,55);
+    ctx.fillStyle='rgba(255,255,255,.15)';ctx.fillRect(sx,sy-68,35,20); // sail remnant
+    // Portholes
+    ctx.fillStyle='rgba(100,180,255,.25)';
+    [sx-30,sx,sx+30].forEach(px=>{ctx.beginPath();ctx.arc(px,sy+5,6,0,Math.PI*2);ctx.fill();});
+    ctx.shadowBlur=0;ctx.font='13px Bubblegum Sans,cursive';
+    ctx.fillStyle='rgba(255,255,255,.65)';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('🚢 Sunken Ship',sx,sy+46);
+  } else if(f.type==='reef'){
+    // Coral reef arch
+    const cols=['#e74c3c','#f39c12','#e91e63','#ff5722','#ff9800'];
+    [-40,-20,0,20,40].forEach((ox,i)=>{
+      ctx.fillStyle=cols[i];
+      const h=40+Math.sin(i*1.4)*20;
+      ctx.beginPath();ctx.ellipse(sx+ox,sy+20,8,h,0,0,Math.PI*2);ctx.fill();
+      // Coral tips
+      ctx.beginPath();ctx.arc(sx+ox,sy+20-h,10,0,Math.PI*2);ctx.fill();
+    });
+    ctx.font='13px Bubblegum Sans,cursive';ctx.fillStyle='rgba(255,255,255,.75)';
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🪸 Coral Reef',sx,sy+45);
+  } else if(f.type==='kelp'){
+    // Kelp forest — tall filled shapes
+    [-25,-10,5,20,-38].forEach((ox,i)=>{
+      const h=60+i*8;
+      ctx.fillStyle=`hsl(${140+i*8},55%,${26+i*3}%)`;
+      ctx.beginPath();ctx.ellipse(sx+ox+Math.sin(G.tick*.02+i)*4,sy-h/2,7,h/2,.1*(i%2?1:-1),0,Math.PI*2);ctx.fill();
+    });
+    ctx.font='13px Bubblegum Sans,cursive';ctx.fillStyle='rgba(150,255,150,.7)';
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🌿 Kelp Forest',sx,sy+40);
+  } else if(f.type==='ice'){
+    // Ice cavern entrance
+    ctx.fillStyle='rgba(168,216,240,.7)';
+    ctx.beginPath();ctx.ellipse(sx,sy+10,55,35,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(200,240,255,.5)';
+    ctx.beginPath();ctx.ellipse(sx,sy+10,38,22,0,0,Math.PI*2);ctx.fill();
+    // Icicles
+    [-30,-15,0,15,30].forEach((ox,i)=>{
+      const h=15+i%3*8;
+      ctx.fillStyle='rgba(200,240,255,.8)';
+      ctx.beginPath();ctx.moveTo(sx+ox-5,sy-18);ctx.lineTo(sx+ox+5,sy-18);ctx.lineTo(sx+ox,sy-18+h);ctx.closePath();ctx.fill();
+    });
+    ctx.font='13px Bubblegum Sans,cursive';ctx.fillStyle='rgba(200,240,255,.8)';
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🧊 Ice Cavern',sx,sy+50);
+  }
+  ctx.restore();
 }
 
 function drawHome(sx,sy){
@@ -1068,6 +1363,12 @@ function drawMinimap(camX,camY,W,H){
   });
   ctx.globalAlpha=.85;
   G.npcs.forEach(npc=>{ctx.fillStyle=npc.color;ctx.beginPath();ctx.arc(mx+npc.x*sc,my+npc.y*sc,3.5,0,Math.PI*2);ctx.fill();});
+  // Features on minimap
+  if(G.features) G.features.forEach(f=>{
+    if((f.type==='chest'&&f.opened)||(f.type==='bottle'&&f.read))return;
+    ctx.fillStyle=f.type==='chest'?'#ffd700':f.type==='bottle'?'#a0d8ef':f.type==='volcano'?'#ff5722':'rgba(100,200,255,.5)';
+    ctx.beginPath();ctx.arc(mx+f.x*sc,my+f.y*sc,f.type==='chest'?3:2,0,Math.PI*2);ctx.fill();
+  });
   ctx.globalAlpha=1;ctx.fillStyle='#ffd700';ctx.strokeStyle='#fff';ctx.lineWidth=1.5;
   ctx.beginPath();ctx.arc(mx+G.homeX*sc,my+G.homeY*sc,5,0,Math.PI*2);ctx.fill();ctx.stroke();
   ctx.fillStyle='#7ee8ff';ctx.beginPath();ctx.arc(mx+G.x*sc,my+G.y*sc,5.5,0,Math.PI*2);ctx.fill();ctx.stroke();
