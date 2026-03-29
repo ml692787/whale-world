@@ -51,9 +51,9 @@ canvas{display:block;position:fixed;inset:0;}
 #dlg-avatar{font-size:56px;flex-shrink:0;animation:bobAvatar 1.2s ease-in-out infinite;}
 @keyframes bobAvatar{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
 #dlg-body{}
-#dlg-name{font-family:'Bubblegum Sans',cursive;font-size:16px;color:var(--gold);margin-bottom:4px;}
-#dlg-text{font-size:19px;line-height:1.5;color:#fff;}
-#dlg-sub{font-size:14px;color:var(--soft);margin-top:6px;}
+#dlg-name{font-family:'Bubblegum Sans',cursive;font-size:18px;color:var(--gold);margin-bottom:4px;}
+#dlg-text{font-size:21px;line-height:1.55;color:#fff;}
+#dlg-sub{font-size:16px;color:var(--soft);margin-top:6px;}
 .dlg-btn{
   margin-top:10px;padding:12px 26px;
   background:linear-gradient(135deg,var(--teal),#1560a0);
@@ -75,11 +75,11 @@ canvas{display:block;position:fixed;inset:0;}
   display:none;
 }
 #quest-hud.open{display:block;}
-#qh-title{font-family:'Bubblegum Sans',cursive;font-size:13px;color:var(--gold);margin-bottom:4px;}
-#qh-text{font-size:14px;color:#fff;line-height:1.3;}
-#qh-bar-wrap{margin-top:6px;background:rgba(255,255,255,0.1);border-radius:20px;height:10px;overflow:hidden;}
+#qh-title{font-family:'Bubblegum Sans',cursive;font-size:15px;color:var(--gold);margin-bottom:4px;}
+#qh-text{font-size:17px;color:#fff;line-height:1.4;}
+#qh-bar-wrap{margin-top:6px;background:rgba(255,255,255,0.1);border-radius:20px;height:12px;overflow:hidden;}
 #qh-bar{height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));border-radius:20px;transition:width .4s;}
-#qh-count{font-size:12px;color:var(--soft);margin-top:3px;}
+#qh-count{font-size:15px;color:var(--soft);margin-top:3px;}
 
 /* HUD TOP BAR */
 #hud{
@@ -90,10 +90,10 @@ canvas{display:block;position:fixed;inset:0;}
   border-bottom:2px solid rgba(35,166,213,0.3);
   backdrop-filter:blur(6px);
 }
-#hud-name{font-family:'Bubblegum Sans',cursive;font-size:18px;color:var(--soft);}
-#hud-stars{font-size:20px;color:var(--gold);}
+#hud-name{font-family:'Bubblegum Sans',cursive;font-size:20px;color:var(--soft);}
+#hud-stars{font-size:22px;color:var(--gold);}
 #hud-power{font-size:18px;}
-#hud-hint{font-size:12px;color:rgba(255,255,255,0.35);}
+#hud-hint{font-size:15px;color:rgba(255,255,255,0.5);}
 
 /* HOME SCREEN */
 #home-screen{
@@ -161,10 +161,10 @@ canvas{display:block;position:fixed;inset:0;}
 .shop-item:hover{border-color:var(--soft);transform:translateY(-3px);}
 .shop-item.owned{border-color:var(--gold);background:rgba(255,215,0,0.08);}
 .shop-item.equipped{border-color:#2ecc71;background:rgba(46,204,113,0.1);}
-.shop-emoji{font-size:40px;display:block;margin-bottom:6px;}
-.shop-name{font-size:14px;color:#fff;margin-bottom:4px;}
-.shop-cost{font-size:13px;color:var(--gold);}
-.shop-desc{font-size:11px;color:var(--soft);margin-top:3px;line-height:1.3;}
+.shop-emoji{font-size:44px;display:block;margin-bottom:6px;}
+.shop-name{font-size:17px;color:#fff;margin-bottom:4px;}
+.shop-cost{font-size:15px;color:var(--gold);}
+.shop-desc{font-size:13px;color:var(--soft);margin-top:3px;line-height:1.3;}
 .leave-cave-btn{
   margin-top:20px;padding:12px 36px;
   background:linear-gradient(135deg,#2ecc71,#1a9a50);
@@ -187,9 +187,9 @@ canvas{display:block;position:fixed;inset:0;}
 }
 @keyframes factIn{from{transform:translateX(-50%) scale(0.7) translateY(-20px);opacity:0;}to{transform:translateX(-50%) scale(1);opacity:1;}}
 #fact-pop.open{display:block;}
-#fact-emoji{font-size:36px;display:block;margin-bottom:6px;}
-#fact-title{font-family:'Bubblegum Sans',cursive;font-size:14px;color:var(--gold);margin-bottom:4px;}
-#fact-text{font-size:16px;color:#fff;line-height:1.4;}
+#fact-emoji{font-size:40px;display:block;margin-bottom:6px;}
+#fact-title{font-family:'Bubblegum Sans',cursive;font-size:16px;color:var(--gold);margin-bottom:4px;}
+#fact-text{font-size:19px;color:#fff;line-height:1.5;}
 
 /* LEVEL UP */
 #levelup{
@@ -227,35 +227,20 @@ canvas{display:block;position:fixed;inset:0;}
 /* ── TOUCH CONTROLS ── */
 #touch-controls{
   position:fixed;inset:0;pointer-events:none;z-index:650;
-  display:none; /* shown only on touch devices */
+  display:none;
 }
-/* Joystick */
-#joystick-zone{
+/* Drag ripple — shows where finger is touching */
+#drag-ripple{
   position:absolute;
-  bottom:calc(16px + env(safe-area-inset-bottom, 0px));
-  left:24px;
-  width:148px;height:148px;
-  pointer-events:all;
-}
-#joystick-base{
-  position:absolute;inset:0;
-  border-radius:50%;
-  background:rgba(255,255,255,0.08);
-  border:3px solid rgba(255,255,255,0.2);
-  backdrop-filter:blur(4px);
-}
-#joystick-knob{
-  position:absolute;
-  width:56px;height:56px;
-  border-radius:50%;
-  background:radial-gradient(circle at 35% 35%,rgba(126,232,255,0.9),rgba(35,166,213,0.7));
-  border:3px solid rgba(255,255,255,0.5);
-  box-shadow:0 4px 16px rgba(0,0,0,0.3);
-  top:50%;left:50%;
+  width:72px;height:72px;border-radius:50%;
+  border:3px solid rgba(126,232,255,0.65);
+  background:rgba(35,166,213,0.12);
+  pointer-events:none;
   transform:translate(-50%,-50%);
-  transition:none;
+  display:none;
+  transition:opacity .15s;
 }
-/* Right-side touch buttons — left of minimap (minimap is 142px wide + 12px margin) */
+/* Right-side touch buttons */
 #touch-right{
   position:absolute;
   bottom:calc(12px + env(safe-area-inset-bottom, 0px));
@@ -281,7 +266,7 @@ canvas{display:block;position:fixed;inset:0;}
   border-color:var(--soft);
 }
 #touch-interact{border-color:rgba(255,215,0,0.7);}
-/* Touch power buttons — above the action buttons */
+/* Touch power buttons */
 #touch-powers{
   position:absolute;
   bottom:calc(170px + env(safe-area-inset-bottom, 0px));
@@ -342,12 +327,8 @@ canvas{display:block;position:fixed;inset:0;}
 
 <!-- TOUCH CONTROLS -->
 <div id="touch-controls">
-  <div id="joystick-zone">
-    <div id="joystick-base"></div>
-    <div id="joystick-knob"></div>
-  </div>
+  <div id="drag-ripple"></div>
   <div id="touch-right">
-    <button class="touch-btn" id="touch-interact" onclick="tryInteract()">💬</button>
     <button class="touch-btn" id="touch-cave" onclick="touchCaveBtn()">🏠</button>
   </div>
   <div id="touch-powers"></div>
@@ -365,8 +346,8 @@ canvas{display:block;position:fixed;inset:0;}
     <div id="dlg-fact" style="display:none;margin-top:10px;padding:10px 12px;
       background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.35);
       border-radius:12px;">
-      <div id="dlg-fact-title" style="font-family:'Bubblegum Sans',cursive;font-size:12px;color:var(--gold);margin-bottom:3px;">🐋 Did You Know?</div>
-      <div id="dlg-fact-text" style="font-size:15px;color:#fff;line-height:1.45;"></div>
+      <div id="dlg-fact-title" style="font-family:'Bubblegum Sans',cursive;font-size:15px;color:var(--gold);margin-bottom:4px;">🐋 Did You Know?</div>
+      <div id="dlg-fact-text" style="font-size:18px;color:#fff;line-height:1.5;"></div>
     </div>
     <button class="dlg-btn" id="dlg-ok" onclick="closeDlg()">OK!</button>
     <button class="dlg-btn" id="dlg-accept" onclick="acceptQuest()" style="display:none;">Accept Quest!</button>
@@ -397,6 +378,7 @@ canvas{display:block;position:fixed;inset:0;}
   <div class="cave-title">🏠 Your Whale Cave!</div>
   <div class="cave-gold" id="cave-gold-display">⭐ 0 Stars</div>
   <div class="cave-tabs">
+    <button class="cave-tab" onclick="showTab('whales')">🐋 Whales</button>
     <button class="cave-tab active" onclick="showTab('colors')">🎨 Colors</button>
     <button class="cave-tab" onclick="showTab('accessories')">✨ Dress Up</button>
     <button class="cave-tab" onclick="showTab('powers')">⚡ Powers</button>
@@ -498,11 +480,11 @@ const SHOP_ITEMS={
 };
 
 const WHALE_TYPES={
-  blue:    {name:'Blue Whale',    body:'#1a6aad',belly:'#a8d8f0',fin:'#1560a0',horn:false},
-  humpback:{name:'Humpback',      body:'#2c3e50',belly:'#bdc3c7',fin:'#1a252f',horn:false},
-  orca:    {name:'Orca',          body:'#111111',belly:'#f0f0f0',fin:'#000000',horn:false},
-  narwhal: {name:'Narwhal',       body:'#7b9eb5',belly:'#d6eaf8',fin:'#5a7f9a',horn:true},
-  beluga:  {name:'Beluga',        body:'#f0f4f8',belly:'#ffffff',fin:'#d0dce8',horn:false},
+  blue:    {name:'Blue Whale', body:'#1a6aad',belly:'#a8d8f0',fin:'#1560a0',horn:false, cost:0,  desc:'The biggest animal ever!'},
+  humpback:{name:'Humpback',   body:'#2c3e50',belly:'#bdc3c7',fin:'#1a252f',horn:false, cost:20, desc:'Amazing singer of the sea!'},
+  orca:    {name:'Orca',       body:'#111111',belly:'#f0f0f0',fin:'#000000',horn:false, cost:30, desc:'Super smart ocean hunter!'},
+  narwhal: {name:'Narwhal',    body:'#7b9eb5',belly:'#d6eaf8',fin:'#5a7f9a',horn:true,  cost:40, desc:'The unicorn of the sea!'},
+  beluga:  {name:'Beluga',     body:'#f0f4f8',belly:'#ffffff',fin:'#d0dce8',horn:false, cost:25, desc:'Canary of the sea!'},
 };
 
 // ════════════════════════════════════════════════════
@@ -525,6 +507,7 @@ const G={
   ownedPowers:{}, activePower:null, powerTimer:0,
   // shop
   ownedItems:new Set(), equippedColor:null, equippedAccs:new Set(),
+  ownedWhales:new Set(['blue']),
   // quest
   quest:null, questProgress:0,
   // ui state
@@ -592,27 +575,42 @@ function leaveCave(){
 function showTab(tab){
   activeTab=tab;
   document.querySelectorAll('.cave-tab').forEach((t,i)=>{
-    t.classList.toggle('active',['colors','accessories','powers'][i]===tab);
+    t.classList.toggle('active',['whales','colors','accessories','powers'][i]===tab);
   });
   renderShop();
 }
 function renderShop(){
   const grid=document.getElementById('shop-grid');
   grid.innerHTML='';
-  const items=SHOP_ITEMS[activeTab==='powers'?'powers':activeTab==='accessories'?'accessories':'colors'];
-  items.forEach(item=>{
-    const owned=G.ownedItems.has(item.id);
-    const equipped=G.equippedColor===item.id||G.equippedAccs.has(item.id)||G.ownedPowers[item.id];
-    const div=document.createElement('div');
-    div.className='shop-item'+(equipped?' equipped':owned?' owned':'');
-    div.innerHTML=`<span class="shop-emoji">${item.emoji}</span>
-      <div class="shop-name">${item.name}</div>
-      <div class="shop-cost">${owned?'✅ Owned':'⭐ '+item.cost}</div>
-      ${item.desc?`<div class="shop-desc">${item.desc}</div>`:''}
-      ${item.key?`<div class="shop-desc">Press [${item.key}] to use!</div>`:''}`;
-    div.onclick=()=>buyOrEquip(item);
-    grid.appendChild(div);
-  });
+  if(activeTab==='whales'){
+    Object.entries(WHALE_TYPES).forEach(([id,wt])=>{
+      const owned=G.ownedWhales.has(id);
+      const equipped=G.whaleType===id;
+      const div=document.createElement('div');
+      div.className='shop-item'+(equipped?' equipped':owned?' owned':'');
+      div.innerHTML=`<span class="shop-emoji">${wt.desc.includes('unicorn')?'🦄':wt.desc.includes('biggest')?'🐋':wt.desc.includes('smart')?'🐋':wt.desc.includes('Canary')?'⚪':'🐋'}</span>
+        <div class="shop-name">${wt.name}</div>
+        <div class="shop-cost">${owned?(equipped?'✅ Swimming!':'Tap to switch'):'⭐ '+wt.cost}</div>
+        <div class="shop-desc">${wt.desc}</div>`;
+      div.onclick=()=>buyEquipWhale(id,wt);
+      grid.appendChild(div);
+    });
+  } else {
+    const items=SHOP_ITEMS[activeTab==='powers'?'powers':activeTab==='accessories'?'accessories':'colors'];
+    items.forEach(item=>{
+      const owned=G.ownedItems.has(item.id);
+      const equipped=G.equippedColor===item.id||G.equippedAccs.has(item.id)||G.ownedPowers[item.id];
+      const div=document.createElement('div');
+      div.className='shop-item'+(equipped?' equipped':owned?' owned':'');
+      div.innerHTML=`<span class="shop-emoji">${item.emoji}</span>
+        <div class="shop-name">${item.name}</div>
+        <div class="shop-cost">${owned?'✅ Owned':'⭐ '+item.cost}</div>
+        ${item.desc?`<div class="shop-desc">${item.desc}</div>`:''}
+        ${item.key?`<div class="shop-desc">Press [${item.key}] to use!</div>`:''}`;
+      div.onclick=()=>buyOrEquip(item);
+      grid.appendChild(div);
+    });
+  }
   document.getElementById('cave-gold-display').textContent='⭐ '+G.stars+' Stars';
 }
 function buyOrEquip(item){
@@ -639,6 +637,22 @@ function buyOrEquip(item){
   updateHUD();
   renderShop();
   updatePowerBar();
+}
+
+function buyEquipWhale(id,wt){
+  if(!G.ownedWhales.has(id)){
+    if(G.stars<wt.cost){showFact({e:'😅',t:'You need more stars! Keep collecting!',title:'Not enough stars!'});return;}
+    G.stars-=wt.cost;
+    G.ownedWhales.add(id);
+    spawnSparkles(window.innerWidth/2,window.innerHeight/2,12);
+    showFact({e:'🐋',t:'You unlocked the '+wt.name+'! '+wt.desc,title:'New Whale!'});
+  }
+  // Switch to this whale type and reset to its natural colors
+  G.whaleType=id;
+  G.bodyColor=wt.body; G.bellyColor=wt.belly;
+  G.equippedColor=null; G.specialColor=null; G.colorRainbowT=0;
+  updateHUD();
+  renderShop();
 }
 
 // ════════════════════════════════════════════════════
@@ -903,18 +917,18 @@ function update(){
   g.nearNPC=null;
   g.npcs.forEach(npc=>{
     const dx=npc.x-g.x,dy=npc.y-g.y;
-    if(dx*dx+dy*dy<80*80)g.nearNPC=npc;
+    if(dx*dx+dy*dy<160*160)g.nearNPC=npc;
   });
 
   // Home proximity
   const hdx=g.homeX-g.x,hdy=g.homeY-g.y;
-  g.nearHome=hdx*hdx+hdy*hdy<90*90;
+  g.nearHome=hdx*hdx+hdy*hdy<160*160;
 
   const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
   const hint=document.getElementById('hud-hint');
-  if(g.nearNPC) hint.textContent=isTouch?'Tap 💬 to talk to '+g.nearNPC.name+'!':'Space or E to talk to '+g.nearNPC.name+'!';
-  else if(g.nearHome) hint.textContent=isTouch?'Tap 🏠 to enter your cave!':'Space or E to enter your cave!';
-  else if(!isTouch) hint.textContent='Arrow keys to swim • Space = interact';
+  if(g.nearNPC) hint.textContent=isTouch?'Tap anywhere to talk to '+g.nearNPC.name+'!':'E to talk to '+g.nearNPC.name+'!';
+  else if(g.nearHome) hint.textContent=isTouch?'Tap anywhere to go into your cave!':'E to enter your cave!';
+  else if(!isTouch) hint.textContent='Arrow keys to swim • E = talk / enter cave';
 
   // Passive bubbles
   if(sp>1&&g.tick%14===0)spawnBubbles(g.x,g.y,1);
@@ -1102,14 +1116,20 @@ function draw(){
   if(G.nearNPC||G.nearHome){
     ctx.save();
     const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
-    ctx.font='16px Bubblegum Sans,cursive';
-    ctx.fillStyle='rgba(255,255,255,0.8)';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.shadowColor=G.nearHome?'#ffd700':'#23a6d5';ctx.shadowBlur=12;
     const label=G.nearHome
-      ?(isTouch?'🏠 Tap 🏠 button!':'🏠 [SPACE] Enter Cave')
-      :(isTouch?'💬 Tap 💬 button!':'💬 [SPACE] Talk to '+G.nearNPC.name);
-    ctx.fillText(label,W/2,H/2-100);
+      ?(isTouch?'Tap anywhere to enter your cave!':'[E] Enter Your Cave')
+      :(isTouch?'Tap anywhere to talk!':'[E] Talk to '+G.nearNPC.name);
+    // Background pill
+    ctx.font='bold 22px Bubblegum Sans,cursive';
+    const tw=ctx.measureText(label).width;
+    ctx.fillStyle=G.nearHome?'rgba(255,215,0,0.18)':'rgba(35,166,213,0.18)';
+    ctx.beginPath();
+    ctx.roundRect(W/2-tw/2-16,H/2-128,tw+32,42,21);
+    ctx.fill();
+    ctx.fillStyle='#fff';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.shadowColor=G.nearHome?'#ffd700':'#23a6d5';ctx.shadowBlur=14;
+    ctx.fillText(label,W/2,H/2-107);
     ctx.restore();
   }
 
@@ -1342,91 +1362,87 @@ function drawNearestArrow(camX,camY,W,H){
 // ════════════════════════════════════════════════════
 //  TOUCH CONTROLS
 // ════════════════════════════════════════════════════
-const touch={active:false,id:null,startX:0,startY:0,dx:0,dy:0};
-const JOYSTICK_R=56; // max knob travel radius
+//  DRAG-TO-SWIM TOUCH CONTROLS
+// ════════════════════════════════════════════════════
+// The whale swims toward where the player drags.
+// Speed is consistent — only direction comes from drag.
+// A short drag = slow, long drag = full speed (capped).
+const drag={active:false,id:null,startX:0,startY:0,dx:0,dy:0};
+const DRAG_FULL=60; // pixels of drag for full speed
 
 function initTouchControls(){
-  // Show touch UI only on touch-capable devices
   const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
   if(!isTouch)return;
   document.getElementById('touch-controls').style.display='block';
-  // Hide keyboard hint on touch
   document.getElementById('hud-hint').style.display='none';
-  // Move power-bar off screen (touch powers used instead)
   document.getElementById('power-bar').style.display='none';
 
-  const zone=document.getElementById('joystick-zone');
-  const knob=document.getElementById('joystick-knob');
+  const ripple=document.getElementById('drag-ripple');
+  const tc=document.getElementById('touch-controls');
 
-  function getZoneCenter(){
-    const r=zone.getBoundingClientRect();
-    return{x:r.left+r.width/2, y:r.top+r.height/2};
-  }
-
-  zone.addEventListener('touchstart',e=>{
+  // Listen on the whole screen for drag (but not on UI buttons)
+  tc.style.pointerEvents='none'; // let events fall through to canvas
+  canvas.addEventListener('touchstart',e=>{
+    if(G.dlgOpen||document.getElementById('cave-screen').style.display!=='none') return;
     e.preventDefault();
     const t=e.changedTouches[0];
-    touch.active=true; touch.id=t.identifier;
-    touch.startX=t.clientX; touch.startY=t.clientY;
-    touch.dx=0; touch.dy=0;
+    drag.active=true; drag.id=t.identifier;
+    drag.startX=t.clientX; drag.startY=t.clientY;
+    drag.dx=0; drag.dy=0;
+    // show ripple at touch point
+    ripple.style.left=t.clientX+'px';
+    ripple.style.top=t.clientY+'px';
+    ripple.style.display='block';
+    ripple.style.opacity='1';
   },{passive:false});
 
-  zone.addEventListener('touchmove',e=>{
+  canvas.addEventListener('touchmove',e=>{
     e.preventDefault();
     for(const t of e.changedTouches){
-      if(t.identifier!==touch.id)continue;
-      let dx=t.clientX-touch.startX;
-      let dy=t.clientY-touch.startY;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist>JOYSTICK_R){dx=dx/dist*JOYSTICK_R;dy=dy/dist*JOYSTICK_R;}
-      touch.dx=dx; touch.dy=dy;
-      // move knob visually
-      knob.style.transform=`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+      if(t.identifier!==drag.id)continue;
+      drag.dx=t.clientX-drag.startX;
+      drag.dy=t.clientY-drag.startY;
+      // move ripple with finger
+      ripple.style.left=t.clientX+'px';
+      ripple.style.top=t.clientY+'px';
     }
   },{passive:false});
 
-  function endTouch(e){
+  function endDrag(e){
     for(const t of e.changedTouches){
-      if(t.identifier===touch.id){
-        touch.active=false; touch.dx=0; touch.dy=0;
-        knob.style.transform='translate(-50%,-50%)';
+      if(t.identifier===drag.id){
+        // On quick tap (tiny drag) near NPC or home — interact
+        const mag=Math.sqrt(drag.dx*drag.dx+drag.dy*drag.dy);
+        if(mag<12){
+          if(G.nearNPC) talkToNPC(G.nearNPC);
+          else if(G.nearHome) showCave();
+        }
+        drag.active=false; drag.dx=0; drag.dy=0;
+        ripple.style.opacity='0';
+        setTimeout(()=>{ ripple.style.display='none'; },150);
       }
     }
   }
-  zone.addEventListener('touchend',endTouch,{passive:false});
-  zone.addEventListener('touchcancel',endTouch,{passive:false});
-
-  // Tap anywhere on game canvas to interact (when near NPC/home)
-  canvas.addEventListener('touchstart',e=>{
-    // only if not on joystick zone
-    const r=zone.getBoundingClientRect();
-    const t=e.touches[0];
-    if(t.clientX>r.right||t.clientY<r.top||t.clientY>r.bottom+20) return;
-  },{passive:true});
+  canvas.addEventListener('touchend',endDrag,{passive:false});
+  canvas.addEventListener('touchcancel',endDrag,{passive:false});
 }
 
-// Inject touch joystick input into the KEYS-style system
-// Called each frame in update()
+// Called each frame — applies drag direction as consistent velocity
 function applyTouchInput(){
-  if(!touch.active)return;
-  const norm=JOYSTICK_R*0.3; // dead zone
-  const mag=Math.sqrt(touch.dx*touch.dx+touch.dy*touch.dy);
-  if(mag<norm)return;
-  // Treat like key presses scaled by magnitude
-  const scale=(mag-norm)/(JOYSTICK_R-norm);
-  const nx=touch.dx/mag*scale;
-  const ny=touch.dy/mag*scale;
-  G.vx+=nx*SPEED*1.1;
-  G.vy+=ny*SPEED*1.1;
+  if(!drag.active)return;
+  const mag=Math.sqrt(drag.dx*drag.dx+drag.dy*drag.dy);
+  if(mag<8)return; // dead zone — tiny wobbles do nothing
+  // Scale 0→1 over first DRAG_FULL pixels, then clamp at 1
+  const scale=Math.min(1, mag/DRAG_FULL);
+  const nx=drag.dx/mag;
+  const ny=drag.dy/mag;
+  G.vx+=nx*SPEED*scale*1.2;
+  G.vy+=ny*SPEED*scale*1.2;
 }
 
 function touchCaveBtn(){
   if(G.nearHome) showCave();
   else showFact({e:'🏠',t:'Swim back to your Cave first! Look for the house on the map!',title:'Not near home!'});
-}
-
-function touchInteract(){
-  tryInteract();
 }
 
 function buildTouchPowers(){
@@ -1442,10 +1458,6 @@ function buildTouchPowers(){
     container.appendChild(btn);
   });
 }
-
-// Override updatePowerBar to also refresh touch powers
-const _origUpdatePowerBar=updatePowerBar;
-// We'll call buildTouchPowers inside updatePowerBar directly:
 
 // ════════════════════════════════════════════════════
 //  HOME SCREEN BUBBLES ANIMATION
