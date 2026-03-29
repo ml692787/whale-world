@@ -5,1498 +5,1096 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Whale World Adventure!</title>
+<title>Whale World!</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Fredoka+One&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-:root{
-  --ui-bg:rgba(2,18,44,0.92);
-  --ui-border:rgba(35,166,213,0.55);
-  --gold:#ffd700;
-  --teal:#23a6d5;
-  --soft:#7ee8ff;
-}
-body{font-family:'Fredoka One',cursive;overflow:hidden;background:#021222;width:100vw;height:100vh;touch-action:none;}
-canvas{display:block;position:fixed;inset:0;}
+:root{--gold:#ffd700;--teal:#23a6d5;--soft:#7ee8ff;--ui:rgba(2,18,44,0.93);--border:rgba(35,166,213,0.55);}
+html,body{width:100%;height:100%;overflow:hidden;background:#021222;font-family:'Fredoka One',cursive;touch-action:none;}
+canvas{position:fixed;inset:0;display:block;}
+.big-btn{padding:18px 52px;background:linear-gradient(135deg,var(--teal),#1560a0);border:3px solid var(--soft);border-radius:50px;color:#fff;font-family:'Bubblegum Sans',cursive;font-size:26px;cursor:pointer;box-shadow:0 0 30px rgba(35,166,213,.5);transition:all .2s;margin:6px;min-height:64px;}
+.big-btn:active{transform:scale(1.07);}
 
-/* ── OVERLAY PANELS ── */
-.panel{
-  position:fixed;z-index:800;
-  background:var(--ui-bg);
-  border:3px solid var(--ui-border);
-  border-radius:24px;
-  padding:20px;
-  backdrop-filter:blur(12px);
-  color:#fff;
-  font-family:'Fredoka One',cursive;
-  box-shadow:0 0 40px rgba(35,166,213,0.25);
-  display:none;
-}
-.panel.open{display:block;}
-.panel-title{
-  font-family:'Bubblegum Sans',cursive;
-  font-size:26px;color:var(--soft);
-  text-align:center;margin-bottom:14px;
-  text-shadow:0 0 16px var(--teal);
-}
+/* TITLE */
+#title{position:fixed;inset:0;z-index:1000;background:linear-gradient(160deg,#0d2a4a 0%,#03224c 50%,#021222 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;}
+#title-canvas{position:absolute;inset:0;pointer-events:none;}
+.t-whale{font-size:clamp(60px,14vw,110px);margin-bottom:8px;animation:bobW 2s ease-in-out infinite;}
+@keyframes bobW{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+.t-title{font-family:'Bubblegum Sans',cursive;font-size:clamp(42px,9vw,76px);color:#fff;text-shadow:0 0 50px var(--teal),0 4px 20px rgba(0,0,0,.6);margin-bottom:10px;text-align:center;}
+.t-sub{font-family:'Bubblegum Sans',cursive;font-size:clamp(18px,4vw,26px);color:var(--soft);margin-bottom:36px;text-align:center;}
 
-/* DIALOGUE BOX */
-#dialogue{
-  bottom:20px;left:50%;transform:translateX(-50%);
-  width:min(660px,94vw);
-  padding:16px 22px;
-  display:none;
-}
-#dialogue.open{display:flex;align-items:flex-start;gap:14px;}
-#dlg-avatar{font-size:56px;flex-shrink:0;animation:bobAvatar 1.2s ease-in-out infinite;}
-@keyframes bobAvatar{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
-#dlg-body{}
-#dlg-name{font-family:'Bubblegum Sans',cursive;font-size:18px;color:var(--gold);margin-bottom:4px;}
-#dlg-text{font-size:21px;line-height:1.55;color:#fff;}
-#dlg-sub{font-size:16px;color:var(--soft);margin-top:6px;}
-.dlg-btn{
-  margin-top:10px;padding:12px 26px;
-  background:linear-gradient(135deg,var(--teal),#1560a0);
-  border:2px solid var(--soft);border-radius:30px;
-  color:#fff;font-family:'Bubblegum Sans',cursive;font-size:18px;
-  cursor:pointer;transition:all .15s;
-  min-height:48px;
-}
-.dlg-btn:hover{transform:scale(1.06);box-shadow:0 0 14px var(--teal);}
+/* DRESS-UP */
+#dress{position:fixed;inset:0;z-index:900;background:linear-gradient(160deg,#0d2a4a,#03224c 50%,#021222);display:none;flex-direction:column;align-items:center;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px 28px;}
+#dress.on{display:flex;}
+.d-title{font-family:'Bubblegum Sans',cursive;font-size:clamp(28px,6vw,46px);color:#fff;text-shadow:0 0 24px var(--teal);margin-bottom:4px;text-align:center;}
+.d-sub{font-family:'Bubblegum Sans',cursive;font-size:19px;color:var(--soft);margin-bottom:16px;text-align:center;}
+.d-layout{display:flex;gap:14px;width:100%;max-width:860px;align-items:flex-start;flex-wrap:wrap;justify-content:center;}
+.d-preview{background:rgba(0,0,30,.4);border:2px solid var(--border);border-radius:22px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:200px;}
+#dress-canvas{border-radius:14px;background:radial-gradient(ellipse at 50% 40%,#0a3a6a,#021222);display:block;}
+.d-wname{font-family:'Bubblegum Sans',cursive;font-size:19px;color:var(--soft);text-align:center;}
+.d-right{flex:1;min-width:260px;}
+.dtab-row{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+.dtab{padding:10px 18px;border-radius:28px;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.14);color:#fff;font-family:'Bubblegum Sans',cursive;font-size:17px;cursor:pointer;min-height:48px;transition:all .15s;}
+.dtab.on{background:rgba(35,166,213,.35);border-color:var(--soft);}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;}
+.ditem{background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.12);border-radius:16px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .18s;min-height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+.ditem:active{border-color:var(--soft);transform:scale(1.04);}
+.ditem.on{border-color:var(--gold);background:rgba(255,215,0,.12);}
+.ditem-e{font-size:38px;line-height:1;}
+.ditem-n{font-family:'Bubblegum Sans',cursive;font-size:14px;color:#fff;}
+.d-go{margin-top:18px;padding:18px 52px;background:linear-gradient(135deg,#2ecc71,#1a9a50);border:3px solid #7dffb3;border-radius:50px;color:#fff;font-family:'Bubblegum Sans',cursive;font-size:28px;cursor:pointer;transition:all .2s;min-height:68px;box-shadow:0 0 30px rgba(46,204,113,.4);}
+.d-go:active{transform:scale(1.06);}
+
+/* HUD */
+#hud{position:fixed;top:0;left:0;right:0;height:56px;z-index:600;display:none;align-items:center;justify-content:space-between;padding:0 14px;background:rgba(2,18,44,.85);border-bottom:2px solid var(--border);backdrop-filter:blur(8px);}
+#hud-name{font-family:'Bubblegum Sans',cursive;font-size:18px;color:var(--soft);}
+#hud-stars{font-family:'Bubblegum Sans',cursive;font-size:24px;color:var(--gold);text-shadow:0 0 10px rgba(255,215,0,.6);}
+#hud-hint{font-size:15px;color:rgba(255,255,255,.5);}
 
 /* QUEST HUD */
-#quest-hud{
-  top:58px;left:12px;
-  width:220px;padding:12px 14px;
-  position:fixed;z-index:700;
-  background:var(--ui-bg);
-  border:2px solid var(--ui-border);
-  border-radius:16px;
-  display:none;
-}
-#quest-hud.open{display:block;}
-#qh-title{font-family:'Bubblegum Sans',cursive;font-size:15px;color:var(--gold);margin-bottom:4px;}
-#qh-text{font-size:17px;color:#fff;line-height:1.4;}
-#qh-bar-wrap{margin-top:6px;background:rgba(255,255,255,0.1);border-radius:20px;height:12px;overflow:hidden;}
+#qhud{position:fixed;top:60px;left:12px;width:224px;z-index:600;background:var(--ui);border:2px solid var(--border);border-radius:16px;padding:12px 14px;display:none;}
+#qhud.on{display:block;}
+#qh-who{font-family:'Bubblegum Sans',cursive;font-size:14px;color:var(--gold);margin-bottom:2px;}
+#qh-text{font-size:18px;color:#fff;line-height:1.4;}
+#qh-wrap{margin-top:7px;background:rgba(255,255,255,.1);border-radius:20px;height:14px;overflow:hidden;}
 #qh-bar{height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));border-radius:20px;transition:width .4s;}
-#qh-count{font-size:15px;color:var(--soft);margin-top:3px;}
+#qh-cnt{font-size:17px;color:var(--soft);margin-top:4px;}
 
-/* HUD TOP BAR */
-#hud{
-  position:fixed;top:0;left:0;right:0;height:50px;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;z-index:700;
-  background:rgba(2,18,44,0.8);
-  border-bottom:2px solid rgba(35,166,213,0.3);
-  backdrop-filter:blur(6px);
-}
-#hud-name{font-family:'Bubblegum Sans',cursive;font-size:20px;color:var(--soft);}
-#hud-stars{font-size:22px;color:var(--gold);}
-#hud-power{font-size:18px;}
-#hud-hint{font-size:15px;color:rgba(255,255,255,0.5);}
+/* CAVE BUTTON — always visible */
+#cave-btn{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:16px;z-index:600;width:76px;height:76px;border-radius:50%;background:rgba(2,18,44,.9);border:3px solid rgba(255,215,0,.75);font-size:34px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:transform .15s;}
+#cave-btn.on{display:flex;}
+#cave-btn:active{transform:scale(.88);}
+#cave-lbl{position:fixed;font-family:'Bubblegum Sans',cursive;font-size:11px;color:rgba(255,215,0,.85);text-align:center;bottom:calc(5px + env(safe-area-inset-bottom,0px));left:16px;width:76px;display:none;pointer-events:none;}
+#cave-lbl.on{display:block;}
 
-/* HOME SCREEN */
-#home-screen{
-  position:fixed;inset:0;z-index:900;
-  background:linear-gradient(160deg,#0a2040 0%,#03224c 40%,#021222 100%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  overflow:hidden;
-}
-.home-bubbles{position:absolute;inset:0;pointer-events:none;}
-.home-title{
-  font-family:'Bubblegum Sans',cursive;
-  font-size:clamp(36px,7vw,64px);
-  color:#fff;
-  text-shadow:0 0 40px var(--teal),0 4px 16px rgba(0,0,0,0.6);
-  margin-bottom:6px;text-align:center;
-}
-.home-sub{font-size:16px;color:var(--soft);margin-bottom:30px;text-align:center;}
-.big-btn{
-  padding:16px 44px;
-  background:linear-gradient(135deg,#23a6d5 0%,#1560a0 100%);
-  border:3px solid var(--soft);border-radius:50px;
-  color:#fff;font-family:'Bubblegum Sans',cursive;font-size:24px;
-  cursor:pointer;transition:all .2s;
-  box-shadow:0 0 30px rgba(35,166,213,0.5);margin:6px;
-}
-.big-btn:hover{transform:scale(1.07);box-shadow:0 0 50px rgba(35,166,213,0.8);}
-
-/* CAVE / SHOP */
-#cave-screen{
-  position:fixed;inset:0;z-index:850;
-  background:radial-gradient(ellipse at 40% 60%,#0a3060 0%,#021222 70%);
-  display:flex;flex-direction:column;align-items:center;
-  overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px;
-}
-.cave-title{
-  font-family:'Bubblegum Sans',cursive;
-  font-size:36px;color:var(--soft);
-  text-shadow:0 0 24px var(--teal);
-  margin-bottom:4px;margin-top:8px;
-}
-.cave-gold{font-size:22px;color:var(--gold);margin-bottom:18px;}
-.cave-tabs{display:flex;gap:8px;margin-bottom:16px;}
-.cave-tab{
-  padding:11px 22px;border-radius:30px;
-  background:rgba(255,255,255,0.07);
-  border:2px solid rgba(255,255,255,0.15);
-  color:#fff;font-family:'Fredoka One',cursive;font-size:15px;
-  cursor:pointer;transition:all .15s;
-  min-height:48px;
-  -webkit-tap-highlight-color:transparent;
-}
-.cave-tab.active{background:rgba(35,166,213,0.35);border-color:var(--soft);}
-.shop-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
-  gap:12px;width:100%;max-width:720px;
-}
-.shop-item{
-  background:rgba(255,255,255,0.06);
-  border:2px solid rgba(255,255,255,0.12);
-  border-radius:18px;padding:16px 14px;
-  text-align:center;cursor:pointer;transition:all .2s;
-  min-height:110px;
-  -webkit-tap-highlight-color:transparent;
-}
-.shop-item:hover{border-color:var(--soft);transform:translateY(-3px);}
-.shop-item.owned{border-color:var(--gold);background:rgba(255,215,0,0.08);}
-.shop-item.equipped{border-color:#2ecc71;background:rgba(46,204,113,0.1);}
-.shop-emoji{font-size:44px;display:block;margin-bottom:6px;}
-.shop-name{font-size:17px;color:#fff;margin-bottom:4px;}
-.shop-cost{font-size:15px;color:var(--gold);}
-.shop-desc{font-size:13px;color:var(--soft);margin-top:3px;line-height:1.3;}
-.leave-cave-btn{
-  margin-top:20px;padding:12px 36px;
-  background:linear-gradient(135deg,#2ecc71,#1a9a50);
-  border:2px solid #7dffb3;border-radius:40px;
-  color:#fff;font-family:'Bubblegum Sans',cursive;font-size:20px;
-  cursor:pointer;transition:all .2s;
-}
-.leave-cave-btn:hover{transform:scale(1.06);}
+/* DIALOGUE */
+#dlg{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);width:min(680px,94vw);z-index:700;background:var(--ui);border:3px solid var(--border);border-radius:24px;padding:18px 20px;display:none;gap:14px;align-items:flex-start;box-shadow:0 0 40px rgba(35,166,213,.3);}
+#dlg.on{display:flex;}
+#dlg-av{font-size:62px;flex-shrink:0;animation:bobA 1.2s ease-in-out infinite;}
+@keyframes bobA{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
+#dlg-who{font-family:'Bubblegum Sans',cursive;font-size:17px;color:var(--gold);margin-bottom:5px;}
+#dlg-txt{font-size:23px;line-height:1.5;color:#fff;}
+#dlg-sub{font-size:17px;color:var(--soft);margin-top:6px;}
+#dlg-fact{display:none;margin-top:12px;padding:12px 14px;background:rgba(255,215,0,.1);border:2px solid rgba(255,215,0,.38);border-radius:14px;}
+#dlg-fact-ttl{font-family:'Bubblegum Sans',cursive;font-size:16px;color:var(--gold);margin-bottom:5px;}
+#dlg-fact-txt{font-size:20px;color:#fff;line-height:1.5;}
+.dbtn{margin-top:12px;padding:13px 30px;background:linear-gradient(135deg,var(--teal),#1560a0);border:2px solid var(--soft);border-radius:30px;color:#fff;font-family:'Bubblegum Sans',cursive;font-size:21px;cursor:pointer;min-height:54px;transition:all .15s;}
+.dbtn:active{transform:scale(1.05);}
 
 /* FACT POPUP */
-#fact-pop{
-  position:fixed;top:64px;left:50%;transform:translateX(-50%);
-  z-index:750;
-  background:rgba(2,18,44,0.95);
-  border:2px solid var(--gold);
-  border-radius:20px;padding:14px 20px;
-  max-width:min(360px,88vw);text-align:center;
-  display:none;animation:factIn .4s cubic-bezier(.175,.885,.32,1.275);
-  cursor:pointer;
-}
-@keyframes factIn{from{transform:translateX(-50%) scale(0.7) translateY(-20px);opacity:0;}to{transform:translateX(-50%) scale(1);opacity:1;}}
-#fact-pop.open{display:block;}
-#fact-emoji{font-size:40px;display:block;margin-bottom:6px;}
-#fact-title{font-family:'Bubblegum Sans',cursive;font-size:16px;color:var(--gold);margin-bottom:4px;}
-#fact-text{font-size:19px;color:#fff;line-height:1.5;}
+#fact{position:fixed;top:64px;left:50%;transform:translateX(-50%);z-index:650;background:rgba(2,18,44,.97);border:2px solid var(--gold);border-radius:20px;padding:16px 22px;max-width:min(380px,90vw);text-align:center;display:none;cursor:pointer;animation:factPop .4s cubic-bezier(.175,.885,.32,1.275);}
+#fact.on{display:block;}
+@keyframes factPop{from{transform:translateX(-50%) scale(.7);opacity:0;}to{transform:translateX(-50%) scale(1);opacity:1;}}
+#fact-ico{font-size:42px;display:block;margin-bottom:6px;}
+#fact-ttl{font-family:'Bubblegum Sans',cursive;font-size:17px;color:var(--gold);margin-bottom:5px;}
+#fact-txt{font-size:21px;color:#fff;line-height:1.5;}
 
 /* LEVEL UP */
-#levelup{
-  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-  z-index:900;text-align:center;pointer-events:none;
-  display:none;
-}
-#levelup.open{display:block;animation:lvlPop .6s cubic-bezier(.175,.885,.32,1.275);}
-@keyframes lvlPop{from{transform:translate(-50%,-50%) scale(0);opacity:0;}to{transform:translate(-50%,-50%) scale(1);opacity:1;}}
-#lvl-text{font-family:'Bubblegum Sans',cursive;font-size:52px;color:var(--gold);text-shadow:0 0 30px var(--gold);}
-#lvl-sub{font-size:22px;color:#fff;margin-top:4px;}
+#lvlup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:900;text-align:center;pointer-events:none;display:none;}
+#lvlup.on{display:block;animation:lvlP .6s cubic-bezier(.175,.885,.32,1.275);}
+@keyframes lvlP{from{transform:translate(-50%,-50%) scale(0);opacity:0;}to{transform:translate(-50%,-50%) scale(1);opacity:1;}}
+#lvl-t{font-family:'Bubblegum Sans',cursive;font-size:58px;color:var(--gold);text-shadow:0 0 30px var(--gold);}
+#lvl-s{font-size:25px;color:#fff;margin-top:6px;}
 
-/* SPARKLES */
-.sp{position:fixed;pointer-events:none;z-index:1000;font-size:22px;animation:spAnim .8s ease-out forwards;}
-@keyframes spAnim{0%{transform:scale(0) rotate(0);opacity:1;}100%{transform:scale(1.4) rotate(200deg) translateY(-40px);opacity:0;}}
+/* SPARKLE */
+.sp{position:fixed;pointer-events:none;z-index:1000;font-size:26px;animation:spA .8s ease-out forwards;}
+@keyframes spA{0%{transform:scale(0) rotate(0);opacity:1;}100%{transform:scale(1.5) rotate(220deg) translateY(-44px);opacity:0;}}
 
-/* POWER INDICATOR */
-#power-bar{
-  position:fixed;bottom:16px;left:16px;z-index:700;
-  display:flex;gap:8px;align-items:center;
-}
-.power-pip{
-  width:38px;height:38px;border-radius:12px;
-  background:rgba(255,255,255,0.07);
-  border:2px solid rgba(255,255,255,0.15);
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;position:relative;
-}
-.power-pip.active{border-color:var(--gold);background:rgba(255,215,0,0.15);box-shadow:0 0 12px rgba(255,215,0,0.4);}
-.power-pip .pip-key{
-  position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);
-  font-size:9px;color:rgba(255,255,255,0.35);white-space:nowrap;
-}
+/* TOUCH */
+#tc{position:fixed;inset:0;pointer-events:none;z-index:550;display:none;}
+#drag-ripple{position:absolute;width:76px;height:76px;border-radius:50%;border:3px solid rgba(126,232,255,.65);background:rgba(35,166,213,.12);pointer-events:none;transform:translate(-50%,-50%);display:none;transition:opacity .15s;}
+#tc-powers{position:absolute;bottom:calc(108px + env(safe-area-inset-bottom,0px));left:106px;display:flex;flex-direction:row;gap:8px;pointer-events:all;}
+.tpbtn{width:58px;height:58px;border-radius:16px;background:rgba(2,18,44,.85);border:2px solid rgba(255,255,255,.2);color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;transition:all .1s;box-shadow:0 3px 10px rgba(0,0,0,.3);}
+.tpbtn.active{border-color:var(--gold);background:rgba(255,215,0,.18);box-shadow:0 0 14px rgba(255,215,0,.5);}
+.tpbtn:active{transform:scale(.87);}
 
-/* ── TOUCH CONTROLS ── */
-#touch-controls{
-  position:fixed;inset:0;pointer-events:none;z-index:650;
-  display:none;
-}
-/* Drag ripple — shows where finger is touching */
-#drag-ripple{
-  position:absolute;
-  width:72px;height:72px;border-radius:50%;
-  border:3px solid rgba(126,232,255,0.65);
-  background:rgba(35,166,213,0.12);
-  pointer-events:none;
-  transform:translate(-50%,-50%);
-  display:none;
-  transition:opacity .15s;
-}
-/* Right-side touch buttons */
-#touch-right{
-  position:absolute;
-  bottom:calc(12px + env(safe-area-inset-bottom, 0px));
-  right:162px;
-  display:flex;flex-direction:column;gap:10px;align-items:center;
-  pointer-events:all;
-}
-.touch-btn{
-  width:72px;height:72px;border-radius:50%;
-  background:rgba(2,18,44,0.82);
-  border:3px solid rgba(35,166,213,0.55);
-  color:#fff;font-size:30px;
-  display:flex;align-items:center;justify-content:center;
-  backdrop-filter:blur(6px);
-  box-shadow:0 4px 18px rgba(0,0,0,0.35);
-  user-select:none;-webkit-user-select:none;
-  transition:transform .1s,background .1s;
-  cursor:pointer;
-}
-.touch-btn:active,.touch-btn.pressed{
-  transform:scale(0.88);
-  background:rgba(35,166,213,0.4);
-  border-color:var(--soft);
-}
-#touch-interact{border-color:rgba(255,215,0,0.7);}
-/* Touch power buttons */
-#touch-powers{
-  position:absolute;
-  bottom:calc(170px + env(safe-area-inset-bottom, 0px));
-  right:162px;
-  display:flex;flex-direction:column;gap:8px;
-  pointer-events:all;
-}
-.touch-power-btn{
-  width:54px;height:54px;border-radius:14px;
-  background:rgba(2,18,44,0.8);
-  border:2px solid rgba(255,255,255,0.2);
-  color:#fff;font-size:24px;
-  display:flex;align-items:center;justify-content:center;
-  backdrop-filter:blur(4px);
-  box-shadow:0 3px 12px rgba(0,0,0,0.3);
-  cursor:pointer;user-select:none;-webkit-user-select:none;
-  transition:all .1s;
-}
-.touch-power-btn.active{border-color:var(--gold);background:rgba(255,215,0,0.2);box-shadow:0 0 14px rgba(255,215,0,0.5);}
-.touch-power-btn:active{transform:scale(0.88);}
+/* CAVE SCREEN */
+#cave{position:fixed;inset:0;z-index:800;background:radial-gradient(ellipse at 45% 55%,#0d2a50 0%,#021222 75%);display:none;flex-direction:column;align-items:center;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px 36px;}
+#cave.on{display:flex;}
+.cave-hdr{font-family:'Bubblegum Sans',cursive;font-size:clamp(28px,6vw,40px);color:var(--soft);text-shadow:0 0 20px var(--teal);margin-top:8px;margin-bottom:2px;}
+.cave-stars{font-family:'Bubblegum Sans',cursive;font-size:23px;color:var(--gold);margin-bottom:16px;}
+.ctabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;justify-content:center;}
+.ctab{padding:10px 18px;border-radius:28px;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.14);color:#fff;font-family:'Bubblegum Sans',cursive;font-size:17px;cursor:pointer;min-height:50px;transition:all .15s;}
+.ctab.on{background:rgba(35,166,213,.35);border-color:var(--soft);}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;width:100%;max-width:700px;}
+.citem{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.12);border-radius:18px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .18s;min-height:110px;}
+.citem:active{border-color:var(--soft);transform:translateY(-2px);}
+.citem.owned{border-color:var(--gold);}
+.citem.equipped{border-color:#2ecc71;background:rgba(46,204,113,.1);}
+.ci-e{font-size:44px;display:block;margin-bottom:6px;}
+.ci-n{font-family:'Bubblegum Sans',cursive;font-size:17px;color:#fff;margin-bottom:3px;}
+.ci-c{font-size:15px;color:var(--gold);}
+.ci-d{font-size:13px;color:var(--soft);margin-top:3px;line-height:1.3;}
+.cave-back{margin-top:18px;padding:16px 44px;background:linear-gradient(135deg,#2ecc71,#1a9a50);border:3px solid #7dffb3;border-radius:44px;color:#fff;font-family:'Bubblegum Sans',cursive;font-size:24px;cursor:pointer;transition:all .2s;min-height:62px;}
+.cave-back:active{transform:scale(1.06);}
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════
-     HOME / TITLE SCREEN
-════════════════════════════════════════ -->
-<div id="home-screen">
-  <canvas class="home-bubbles" id="home-canvas"></canvas>
-  <div class="home-title">🐋 Whale World!</div>
-  <div class="home-sub">Your underwater adventure awaits!</div>
-  <button class="big-btn" onclick="beginGame()">🌊 Play!</button>
+<!-- TITLE -->
+<div id="title">
+  <canvas id="title-canvas"></canvas>
+  <div class="t-whale">🐋</div>
+  <div class="t-title">Whale World!</div>
+  <div class="t-sub">Swim, make friends, and find stars!</div>
+  <button class="big-btn" onclick="goToDress()">▶ Play!</button>
 </div>
 
-<!-- ═══════════════════════════════════════
-     GAME CANVAS
-════════════════════════════════════════ -->
-<canvas id="gameCanvas"></canvas>
+<!-- DRESS-UP -->
+<div id="dress">
+  <div class="d-title">Make Your Whale!</div>
+  <div class="d-sub">Pick colors and hats, then swim!</div>
+  <div class="d-layout">
+    <div class="d-preview">
+      <canvas id="dress-canvas" width="200" height="140"></canvas>
+      <div class="d-wname" id="d-wname">Blue Whale</div>
+    </div>
+    <div class="d-right">
+      <div class="dtab-row">
+        <button class="dtab on" onclick="setDTab('color')">🎨 Colors</button>
+        <button class="dtab"    onclick="setDTab('acc')">🎩 Hats</button>
+      </div>
+      <div class="dgrid" id="dgrid"></div>
+    </div>
+  </div>
+  <button class="d-go" onclick="startGame()">🌊 Let's Go!</button>
+</div>
+
+<!-- GAME CANVAS -->
+<canvas id="gc"></canvas>
 
 <!-- HUD -->
-<div id="hud" style="display:none;">
+<div id="hud">
   <div id="hud-name">🐋 Blue Whale</div>
+  <div id="hud-hint"></div>
   <div id="hud-stars">⭐ 0</div>
-  <div id="hud-power"></div>
-  <div id="hud-hint">Arrow keys to swim • Space = power!</div>
 </div>
 
 <!-- Quest HUD -->
-<div id="quest-hud">
-  <div id="qh-title">📜 Quest!</div>
-  <div id="qh-text">...</div>
-  <div id="qh-bar-wrap"><div id="qh-bar" style="width:0%"></div></div>
-  <div id="qh-count"></div>
+<div id="qhud">
+  <div id="qh-who">Quest!</div>
+  <div id="qh-text"></div>
+  <div id="qh-wrap"><div id="qh-bar" style="width:0%"></div></div>
+  <div id="qh-cnt"></div>
 </div>
 
-<!-- Power bar -->
-<div id="power-bar"></div>
+<!-- Cave button — always visible -->
+<button id="cave-btn" onclick="openCave()">🏠</button>
+<div id="cave-lbl">My Cave</div>
 
-<!-- TOUCH CONTROLS -->
-<div id="touch-controls">
+<!-- Touch controls -->
+<div id="tc">
   <div id="drag-ripple"></div>
-  <div id="touch-right">
-    <button class="touch-btn" id="touch-cave" onclick="touchCaveBtn()">🏠</button>
-  </div>
-  <div id="touch-powers"></div>
+  <div id="tc-powers"></div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     DIALOGUE BOX
-════════════════════════════════════════ -->
-<div class="panel" id="dialogue">
-  <div id="dlg-avatar">🐢</div>
-  <div id="dlg-body">
-    <div id="dlg-name">Terry the Turtle</div>
-    <div id="dlg-text">Hello there!</div>
+<!-- Dialogue -->
+<div id="dlg">
+  <div id="dlg-av">🐢</div>
+  <div style="flex:1">
+    <div id="dlg-who"></div>
+    <div id="dlg-txt"></div>
     <div id="dlg-sub"></div>
-    <div id="dlg-fact" style="display:none;margin-top:10px;padding:10px 12px;
-      background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.35);
-      border-radius:12px;">
-      <div id="dlg-fact-title" style="font-family:'Bubblegum Sans',cursive;font-size:15px;color:var(--gold);margin-bottom:4px;">🐋 Did You Know?</div>
-      <div id="dlg-fact-text" style="font-size:18px;color:#fff;line-height:1.5;"></div>
+    <div id="dlg-fact">
+      <div id="dlg-fact-ttl">🐋 Did You Know?</div>
+      <div id="dlg-fact-txt"></div>
     </div>
-    <button class="dlg-btn" id="dlg-ok" onclick="closeDlg()">OK!</button>
-    <button class="dlg-btn" id="dlg-accept" onclick="acceptQuest()" style="display:none;">Accept Quest!</button>
+    <button class="dbtn" id="dlg-ok" onclick="closeDlg()">OK! 👍</button>
+    <button class="dbtn" id="dlg-acc" onclick="acceptQuest()" style="display:none">Yes! I'll help! 🌟</button>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     FACT POPUP
-════════════════════════════════════════ -->
-<div id="fact-pop">
-  <span id="fact-emoji">🐋</span>
-  <div id="fact-title">Did You Know?</div>
-  <div id="fact-text"></div>
+<!-- Fact popup -->
+<div id="fact" onclick="dismissFact()">
+  <span id="fact-ico"></span>
+  <div id="fact-ttl">Did You Know?</div>
+  <div id="fact-txt"></div>
 </div>
 
-<!-- ═══════════════════════════════════════
-     LEVEL UP
-════════════════════════════════════════ -->
-<div id="levelup">
-  <div id="lvl-text">⭐ LEVEL UP! ⭐</div>
-  <div id="lvl-sub"></div>
-</div>
+<!-- Level up -->
+<div id="lvlup"><div id="lvl-t"></div><div id="lvl-s"></div></div>
 
-<!-- ═══════════════════════════════════════
-     CAVE / SHOP SCREEN
-════════════════════════════════════════ -->
-<div id="cave-screen" style="display:none;">
-  <div class="cave-title">🏠 Your Whale Cave!</div>
-  <div class="cave-gold" id="cave-gold-display">⭐ 0 Stars</div>
-  <div class="cave-tabs">
-    <button class="cave-tab" onclick="showTab('whales')">🐋 Whales</button>
-    <button class="cave-tab active" onclick="showTab('colors')">🎨 Colors</button>
-    <button class="cave-tab" onclick="showTab('accessories')">✨ Dress Up</button>
-    <button class="cave-tab" onclick="showTab('powers')">⚡ Powers</button>
+<!-- Cave screen -->
+<div id="cave">
+  <div class="cave-hdr">🏠 Your Cave!</div>
+  <div class="cave-stars" id="cave-gold">⭐ 0 Stars</div>
+  <div class="ctabs">
+    <button class="ctab on"  onclick="setCTab('whale')">🐋 Whales</button>
+    <button class="ctab"     onclick="setCTab('color')">🎨 Colors</button>
+    <button class="ctab"     onclick="setCTab('acc')">🎩 Hats</button>
+    <button class="ctab"     onclick="setCTab('power')">⚡ Powers</button>
   </div>
-  <div class="shop-grid" id="shop-grid"></div>
-  <button class="leave-cave-btn" onclick="leaveCave()">🌊 Go Explore!</button>
+  <div class="cgrid" id="cgrid"></div>
+  <button class="cave-back" onclick="closeCave()">🌊 Back to Swimming!</button>
 </div>
 
 <script>
-// ════════════════════════════════════════════════════
-//  DATA
-// ════════════════════════════════════════════════════
-const WHALE_FACTS=[
-  {e:'🐋',t:'Blue whales are the BIGGEST animals that have EVER lived on Earth! Even bigger than dinosaurs!'},
-  {e:'🎵',t:'Humpback whales sing beautiful songs that can last for HOURS! No two songs are the same!'},
-  {e:'🦷',t:'Blue whales have no teeth! They use giant bristles called baleen to catch tiny shrimp called krill.'},
-  {e:'💨',t:'Whales breathe AIR, just like you! They hold their breath and come up to breathe through their blowholes.'},
-  {e:'🧠',t:'Orcas (killer whales) are super smart! They live in families and even have their own language!'},
-  {e:'🦄',t:'Narwhals have a long spiral tusk! It\'s actually a giant tooth that grows through their lip. Magical!'},
-  {e:'⚪',t:'Beluga whales are called the "canaries of the sea" because they make SO many funny sounds!'},
-  {e:'🍤',t:'A blue whale eats up to 40 million tiny krill every single day! That\'s like eating 4 million sandwiches!'},
-  {e:'💤',t:'Whales sleep by floating near the surface. Only half their brain sleeps at a time so they can keep breathing!'},
-  {e:'👶',t:'Baby blue whales drink 50 bathtubs of milk every day and grow super fast!'},
-  {e:'📏',t:'Blue whales can grow to 100 feet long. That\'s as long as 3 school buses lined up!'},
-  {e:'❤️',t:'A blue whale\'s heart is as big as a small car and beats only about 8 times per minute!'},
-  {e:'🐋',t:'Sperm whales can dive 2 miles underwater and hold their breath for 90 minutes!'},
-  {e:'🌍',t:'Whales help the whole ocean! Their poop (yes, poop!) feeds tiny plants that make oxygen for us to breathe.'},
-  {e:'🏋️',t:'A whale\'s tongue can weigh as much as an elephant! Blue whales have the biggest tongues ever!'},
+'use strict';
+
+// ════════════════ DATA ════════════════
+// Facts: short sentences, kindergarten level
+const FACTS=[
+  {e:'🐋',t:'Blue whales are the biggest animals EVER! Even bigger than dinosaurs!'},
+  {e:'🎵',t:'Humpback whales love to sing! Their songs can go on for hours!'},
+  {e:'💨',t:'Whales breathe air just like you! They come up to breathe through their blowhole!'},
+  {e:'🧠',t:'Orcas are very smart! They live with their family and talk to each other!'},
+  {e:'🦄',t:'Narwhals have a long horn! It is really a big tooth! So magical!'},
+  {e:'⚪',t:'Beluga whales are white and make lots of funny sounds!'},
+  {e:'🍤',t:'Blue whales eat millions of tiny shrimp every single day!'},
+  {e:'💤',t:'Whales sleep by floating! Half their brain stays awake so they can breathe!'},
+  {e:'👶',t:'Baby blue whales grow very, very fast! They drink lots of milk!'},
+  {e:'📏',t:'Blue whales are as long as three school buses! So big!'},
+  {e:'❤️',t:'A blue whale\'s heart is as big as a car!'},
+  {e:'🌊',t:'Some whales can hold their breath for a very long time underwater!'},
+  {e:'🌍',t:'Whales help keep the whole ocean healthy and happy!'},
+  {e:'🏋️',t:'A blue whale\'s tongue weighs as much as an elephant!'},
+  {e:'👪',t:'Whales live with their moms and dads, just like you!'},
 ];
 
 const NPC_DEFS=[
-  {id:'terry',  name:'Terry the Turtle',  emoji:'🐢', color:'#2ecc71',
-   lines:['Hello little whale! The ocean is full of wonders today!','I have been swimming these seas for 100 years! There is so much to discover!','Come back anytime for a new adventure, friend!'],
-   questLines:['Oh! Could you help me? I lost my favorite shells!','You are SO helpful! Here is your reward!']},
-  {id:'crabby', name:'Crabby the Crab',   emoji:'🦀', color:'#e74c3c',
-   lines:['SNAP SNAP! Oh! You scared me! I was just... being crabby hehe!','I found a treasure chest once but a fish ate my map. Very rude!','SNAP SNAP! That means hello in crab language!'],
-   questLines:['Ohhhh could you find some sparkly diamonds? I love shiny things! SNAP!','OHHH you are the best whale friend EVER! SNAP SNAP SNAP!']},
-  {id:'jellie', name:'Jelly the Jellyfish',emoji:'🪼', color:'#9b59b6',
-   lines:['I glow in the dark! Pretty cool right? I taught myself!','The deep ocean is FULL of magic. I have seen it!','Sometimes I forget where I am going because I have no brain. But I am still VERY wise!'],
-   questLines:['Oh wise one! Collect the magical glowing orbs for my spell! Pretty please?','WONDERFUL! The magic of the sea rewards you! ✨']},
-  {id:'dolly',  name:'Dolly the Dolphin',  emoji:'🐬', color:'#23a6d5',
-   lines:['Eeee eeee! That means YAY in dolphin!','Race you to the coral reef! Just kidding... unless?','Did you know dolphins and whales are cousins? We are FAMILY!'],
-   questLines:['Hey hey hey! I am throwing a party but I need FISH friends to come! Can you find some?','EEE EEE EEE! Party time! Thank you thank you thank you!']},
+  {id:'terry', name:'Terry the Turtle', emoji:'🐢', color:'#2ecc71',
+   lines:['Hi there! The ocean is so fun today!','I love swimming! Do you?','You are my best friend!'],
+   qLines:['Oh no! I lost my shells! Can you find them?','Thank you SO much! You are amazing!']},
+  {id:'crabby', name:'Crabby the Crab', emoji:'🦀', color:'#e74c3c',
+   lines:['SNAP! Hi! You gave me a fright!','I love shiny sparkly things!','Snap snap means HELLO in crab!'],
+   qLines:['Can you find some shiny gems for me? Pretty please?','WOW! You found them all! SNAP SNAP!']},
+  {id:'jellie', name:'Jelly the Jellyfish', emoji:'🪼', color:'#9b59b6',
+   lines:['I can glow in the dark! So cool!','The deep sea is full of magic!','I am very wise. I think...'],
+   qLines:['Can you find magic orbs for my big spell?','You did it! Amazing! Thank you!']},
+  {id:'dolly', name:'Dolly the Dolphin', emoji:'🐬', color:'#23a6d5',
+   lines:['Eee eee! That means YAY in dolphin!','Dolphins and whales are cousins!','Let\'s swim fast together!'],
+   qLines:['I\'m having a party! Can you find some fish friends?','EEE EEE! Party time! Yay yay yay!']},
 ];
 
-const COLLECTIBLES=[
-  {id:'star',   emoji:'⭐', points:1,  label:'Star',    size:28, glow:'rgba(255,215,0,0.6)'},
-  {id:'diamond',emoji:'💎', points:3,  label:'Diamond', size:26, glow:'rgba(100,200,255,0.6)'},
-  {id:'shell',  emoji:'🐚', points:2,  label:'Shell',   size:28, glow:'rgba(255,180,120,0.5)'},
-  {id:'coral',  emoji:'🪸', points:2,  label:'Coral',   size:30, glow:'rgba(255,100,100,0.4)'},
-  {id:'fish',   emoji:'🐠', points:5,  label:'Fish',    size:32, glow:'rgba(255,150,50,0.5)'},
-  {id:'orb',    emoji:'🔮', points:6,  label:'Magic Orb',size:26,glow:'rgba(180,100,255,0.7)'},
-  {id:'jellyfish',emoji:'🪼',points:3, label:'Jellyfish',size:30,glow:'rgba(200,150,255,0.5)'},
-  {id:'squid',  emoji:'🦑', points:4,  label:'Squid',   size:28, glow:'rgba(150,100,180,0.5)'},
-  {id:'pearl',  emoji:'🫧', points:2,  label:'Pearl',   size:24, glow:'rgba(200,230,255,0.5)'},
-  {id:'krill',  emoji:'🦐', points:1,  label:'Krill',   size:22, glow:'rgba(255,200,150,0.4)'},
+const QUEST_T=[
+  {giver:'terry',  target:'shell',     count:3, reward:10, text:'Find {n} shells for Terry!'},
+  {giver:'crabby', target:'diamond',   count:2, reward:12, text:'Find {n} gems for Crabby!'},
+  {giver:'jellie', target:'orb',       count:2, reward:15, text:'Find {n} magic orbs for Jelly!'},
+  {giver:'dolly',  target:'fish',      count:3, reward:15, text:'Find {n} fish for Dolly\'s party!'},
+  {giver:'terry',  target:'star',      count:4, reward:8,  text:'Bring {n} stars to Terry!'},
+  {giver:'crabby', target:'pearl',     count:3, reward:10, text:'Find {n} pearls for Crabby!'},
+  {giver:'jellie', target:'jellyfish', count:3, reward:12, text:'Find {n} jellyfish for Jelly!'},
+  {giver:'dolly',  target:'krill',     count:5, reward:10, text:'Find {n} krill for Dolly!'},
 ];
 
-const QUEST_TEMPLATES=[
-  {giver:'terry',  target:'shell',     count:4, reward:12, text:'Collect {n} shells for Terry!'},
-  {giver:'crabby', target:'diamond',   count:3, reward:15, text:'Find {n} sparkling diamonds for Crabby!'},
-  {giver:'jellie', target:'orb',       count:3, reward:18, text:'Collect {n} magic orbs for Jelly\'s spell!'},
-  {giver:'dolly',  target:'fish',      count:5, reward:20, text:'Find {n} fish friends for Dolly\'s party!'},
-  {giver:'terry',  target:'star',      count:6, reward:10, text:'Gather {n} stars for Terry!'},
-  {giver:'crabby', target:'pearl',     count:5, reward:12, text:'Bring {n} pearls to Crabby! SNAP!'},
-  {giver:'jellie', target:'jellyfish', count:4, reward:16, text:'Find {n} jellyfish cousins for Jelly!'},
-  {giver:'dolly',  target:'krill',     count:8, reward:14, text:'Collect {n} krill snacks for Dolly!'},
-];
-
-const SHOP_ITEMS={
-  colors:[
-    {id:'c_lime',  emoji:'🟢', name:'Lime Green',   cost:8,  type:'color', bodyColor:'#2ecc71',bellyColor:'#a8ffcc'},
-    {id:'c_pink',  emoji:'🩷', name:'Cotton Candy', cost:8,  type:'color', bodyColor:'#ff69b4',bellyColor:'#ffcce5'},
-    {id:'c_gold',  emoji:'🟡', name:'Golden',       cost:15, type:'color', bodyColor:'#f39c12',bellyColor:'#fff3c0'},
-    {id:'c_purple',emoji:'🟣', name:'Royal Purple',  cost:12, type:'color', bodyColor:'#8e44ad',bellyColor:'#e8d5ff'},
-    {id:'c_red',   emoji:'🔴', name:'Fire Red',      cost:10, type:'color', bodyColor:'#e74c3c',bellyColor:'#ffc0bb'},
-    {id:'c_galaxy',emoji:'🌌', name:'Galaxy',        cost:25, type:'color', bodyColor:'#1a0050',bellyColor:'#6a0dad', special:'galaxy'},
-    {id:'c_rainbow',emoji:'🌈',name:'Rainbow',       cost:30, type:'color', bodyColor:'#ff69b4',bellyColor:'#a8f0ff', special:'rainbow'},
-    {id:'c_ocean', emoji:'🌊', name:'Deep Ocean',    cost:10, type:'color', bodyColor:'#006994',bellyColor:'#b3ecff'},
-  ],
-  accessories:[
-    {id:'a_crown',   emoji:'👑', name:'Royal Crown',    cost:10, type:'acc'},
-    {id:'a_hat',     emoji:'🎩', name:'Top Hat',         cost:8,  type:'acc'},
-    {id:'a_bow',     emoji:'🎀', name:'Cute Bow',        cost:6,  type:'acc'},
-    {id:'a_glasses', emoji:'🕶️', name:'Cool Shades',    cost:7,  type:'acc'},
-    {id:'a_flower',  emoji:'🌸', name:'Cherry Blossom',  cost:8,  type:'acc'},
-    {id:'a_star',    emoji:'⭐', name:'Star Badge',      cost:6,  type:'acc'},
-    {id:'a_rainbow', emoji:'🌈', name:'Rainbow Tail',    cost:14, type:'acc'},
-    {id:'a_halo',    emoji:'😇', name:'Angel Halo',      cost:18, type:'acc'},
-    {id:'a_party',   emoji:'🎉', name:'Party Hat',       cost:9,  type:'acc'},
-    {id:'a_magic',   emoji:'🔮', name:'Magic Crystal',   cost:20, type:'acc'},
-  ],
-  powers:[
-    {id:'p_speed',   emoji:'⚡', name:'Turbo Speed',    cost:20, type:'power', key:'1', desc:'Zoom super fast for 5 seconds!'},
-    {id:'p_magnet',  emoji:'🧲', name:'Treasure Magnet',cost:25, type:'power', key:'2', desc:'Pull nearby treasures to you!'},
-    {id:'p_shield',  emoji:'🛡️', name:'Bubble Shield',  cost:30, type:'power', key:'3', desc:'A beautiful shield of bubbles!'},
-    {id:'p_glow',    emoji:'✨', name:'Star Glow',       cost:20, type:'power', key:'4', desc:'Glow like a star and stun fish!'},
-  ],
+// Stars are 40% of spawns, bigger, brighter — the MAIN thing to collect
+const COLLECT_DEF={
+  star:     {emoji:'⭐',pts:3,size:30,glow:'rgba(255,215,0,1)',    main:true},
+  diamond:  {emoji:'💎',pts:5,size:22,glow:'rgba(100,200,255,.8)', main:false},
+  shell:    {emoji:'🐚',pts:2,size:24,glow:'rgba(255,180,120,.6)', main:false},
+  pearl:    {emoji:'🫧',pts:2,size:20,glow:'rgba(200,230,255,.6)', main:false},
+  orb:      {emoji:'🔮',pts:6,size:22,glow:'rgba(180,100,255,.9)', main:false},
+  fish:     {emoji:'🐠',pts:4,size:26,glow:'rgba(255,150,50,.6)',  main:false},
+  coral:    {emoji:'🪸',pts:2,size:24,glow:'rgba(255,100,100,.5)', main:false},
+  krill:    {emoji:'🦐',pts:1,size:18,glow:'rgba(255,200,150,.4)', main:false},
+  jellyfish:{emoji:'🪼',pts:3,size:24,glow:'rgba(200,150,255,.6)', main:false},
 };
+const SPAWN_IDS=['star','star','star','star','diamond','shell','pearl','orb','fish','coral','krill','jellyfish'];
 
 const WHALE_TYPES={
-  blue:    {name:'Blue Whale', body:'#1a6aad',belly:'#a8d8f0',fin:'#1560a0',horn:false, cost:0,  desc:'The biggest animal ever!'},
-  humpback:{name:'Humpback',   body:'#2c3e50',belly:'#bdc3c7',fin:'#1a252f',horn:false, cost:20, desc:'Amazing singer of the sea!'},
-  orca:    {name:'Orca',       body:'#111111',belly:'#f0f0f0',fin:'#000000',horn:false, cost:30, desc:'Super smart ocean hunter!'},
-  narwhal: {name:'Narwhal',    body:'#7b9eb5',belly:'#d6eaf8',fin:'#5a7f9a',horn:true,  cost:40, desc:'The unicorn of the sea!'},
-  beluga:  {name:'Beluga',     body:'#f0f4f8',belly:'#ffffff',fin:'#d0dce8',horn:false, cost:25, desc:'Canary of the sea!'},
+  blue:    {name:'Blue Whale', emoji:'🐋',body:'#1a6aad',belly:'#a8d8f0',fin:'#1560a0',horn:false,cost:0,  desc:'The biggest animal ever!'},
+  humpback:{name:'Humpback',   emoji:'🐋',body:'#2c3e50',belly:'#bdc3c7',fin:'#1a252f',horn:false,cost:20, desc:'Amazing singer of the sea!'},
+  orca:    {name:'Orca',       emoji:'🐋',body:'#111111',belly:'#f0f0f0',fin:'#000',   horn:false,cost:30, desc:'Super smart ocean hunter!'},
+  narwhal: {name:'Narwhal',    emoji:'🦄',body:'#7b9eb5',belly:'#d6eaf8',fin:'#5a7f9a',horn:true, cost:40, desc:'The unicorn of the sea!'},
+  beluga:  {name:'Beluga',     emoji:'⚪',body:'#f0f4f8',belly:'#ffffff',fin:'#d0dce8',horn:false,cost:25, desc:'White and very funny!'},
 };
 
-// ════════════════════════════════════════════════════
-//  GAME STATE
-// ════════════════════════════════════════════════════
+const COLORS=[
+  {id:'c_lime',   emoji:'🟢',name:'Lime Green',   cost:8,  body:'#2ecc71',belly:'#a8ffcc'},
+  {id:'c_pink',   emoji:'🩷',name:'Cotton Candy', cost:8,  body:'#ff69b4',belly:'#ffcce5'},
+  {id:'c_gold',   emoji:'🟡',name:'Golden',       cost:15, body:'#f39c12',belly:'#fff3c0'},
+  {id:'c_purple', emoji:'🟣',name:'Purple',       cost:12, body:'#8e44ad',belly:'#e8d5ff'},
+  {id:'c_red',    emoji:'🔴',name:'Fire Red',     cost:10, body:'#e74c3c',belly:'#ffc0bb'},
+  {id:'c_ocean',  emoji:'🌊',name:'Deep Ocean',   cost:10, body:'#006994',belly:'#b3ecff'},
+  {id:'c_galaxy', emoji:'🌌',name:'Galaxy',       cost:25, body:'#1a0050',belly:'#6a0dad',special:'galaxy'},
+  {id:'c_rainbow',emoji:'🌈',name:'Rainbow!',     cost:35, body:'#ff69b4',belly:'#a8f0ff',special:'rainbow'},
+];
+const ACCS=[
+  {id:'a_crown',  emoji:'👑',name:'Crown',      cost:10},
+  {id:'a_hat',    emoji:'🎩',name:'Top Hat',    cost:8},
+  {id:'a_bow',    emoji:'🎀',name:'Bow',        cost:6},
+  {id:'a_glasses',emoji:'🕶️',name:'Cool Shades',cost:7},
+  {id:'a_flower', emoji:'🌸',name:'Flower',     cost:8},
+  {id:'a_halo',   emoji:'😇',name:'Halo',       cost:18},
+  {id:'a_party',  emoji:'🎉',name:'Party Hat',  cost:9},
+  {id:'a_magic',  emoji:'🔮',name:'Magic Orb',  cost:20},
+];
+const POWERS=[
+  {id:'p_speed', emoji:'⚡',name:'Go Fast!',       cost:20,key:'1',desc:'Swim super fast!'},
+  {id:'p_magnet',emoji:'🧲',name:'Star Magnet!',   cost:25,key:'2',desc:'Stars fly to you!'},
+  {id:'p_shield',emoji:'🛡️',name:'Bubble Shield!', cost:30,key:'3',desc:'Bubble armor!'},
+  {id:'p_glow',  emoji:'✨',name:'Star Glow!',     cost:20,key:'4',desc:'Glow super bright!'},
+];
+
+// ════════════════ STATE ════════════════
 const G={
-  // whale
-  whaleType:'blue', bodyColor:'#1a6aad', bellyColor:'#a8d8f0',
-  accessories:{},
-  specialColor:null,
-  // player
-  x:1600,y:1600, vx:0,vy:0, angle:0,
-  stars:0, level:1, xp:0, xpNext:20,
-  // world
-  items:[], npcs:[], decorPts:[],
-  homeX:1600, homeY:1550,
-  bubbles:[], particles:[],
+  whaleType:'blue',bodyColor:'#1a6aad',bellyColor:'#a8d8f0',
+  specialColor:null,rainbowT:0,
+  equippedColor:null,equippedAccs:new Set(),
+  ownedWhales:new Set(['blue']),ownedColors:new Set(),
+  ownedAccs:new Set(),ownedPowers:{},
+  stars:0,level:1,xp:0,xpNext:20,
+  x:1600,y:1600,vx:0,vy:0,angle:0,
+  homeX:1600,homeY:1560,
+  items:[],npcs:[],decor:[],
+  bubbles:[],starBursts:[],
   tick:0,
-  // powers
-  ownedPowers:{}, activePower:null, powerTimer:0,
-  // shop
-  ownedItems:new Set(), equippedColor:null, equippedAccs:new Set(),
-  ownedWhales:new Set(['blue']),
-  // quest
-  quest:null, questProgress:0,
-  // ui state
-  nearNPC:null, nearHome:false,
-  dlgQueue:[], dlgOpen:false,
+  activePower:null,powerTimer:0,
+  quest:null,questProg:0,
+  nearNPC:null,
+  dlgOpen:false,caveOpen:false,
   factsShown:new Set(),
-  screenShake:0,
-  colorRainbowT:0,
 };
 const KEYS={};
 const WORLD=3200;
+const isTouchDevice=()=>('ontouchstart' in window)||navigator.maxTouchPoints>0;
 
-// ════════════════════════════════════════════════════
-//  INIT
-// ════════════════════════════════════════════════════
-function beginGame(){
-  document.getElementById('home-screen').style.display='none';
+// ════════════════ CANVAS ════════════════
+const gc=document.getElementById('gc');
+const ctx=gc.getContext('2d');
+function resize(){gc.width=window.innerWidth;gc.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+
+const bgC=document.createElement('canvas');
+bgC.width=WORLD;bgC.height=WORLD;let bgReady=false;
+function buildBg(){
+  const bc=bgC.getContext('2d');
+  const gr=bc.createLinearGradient(0,0,0,WORLD);
+  gr.addColorStop(0,'#1a7aad');gr.addColorStop(.25,'#0a4a7c');
+  gr.addColorStop(.6,'#03224c');gr.addColorStop(1,'#010e20');
+  bc.fillStyle=gr;bc.fillRect(0,0,WORLD,WORLD);
+  for(let i=0;i<22;i++){
+    const rx=Math.random()*WORLD;
+    const lg=bc.createLinearGradient(rx,0,rx+80,WORLD*.55);
+    lg.addColorStop(0,'rgba(255,255,255,.048)');lg.addColorStop(1,'transparent');
+    bc.save();bc.translate(rx,0);bc.rotate((Math.random()-.5)*.18);
+    bc.fillStyle=lg;bc.fillRect(-20,0,55,WORLD*.6);bc.restore();
+  }
+  bgReady=true;
+}
+setTimeout(buildBg,50);
+
+// ════════════════ TITLE BUBBLES ════════════════
+const tc2=document.getElementById('title-canvas');
+const tctx=tc2.getContext('2d');
+const tBubs=[];
+(function initTBubs(){
+  tc2.width=window.innerWidth;tc2.height=window.innerHeight;
+  for(let i=0;i<35;i++) tBubs.push({x:Math.random()*tc2.width,y:Math.random()*tc2.height,r:5+Math.random()*18,sp:.3+Math.random()*.7,t:Math.random()*100});
+})();
+(function animT(){
+  if(document.getElementById('title').style.display==='none')return;
+  tctx.clearRect(0,0,tc2.width,tc2.height);
+  tBubs.forEach(b=>{
+    b.y-=b.sp;b.x+=Math.sin(b.t*.06)*.7;b.t++;
+    if(b.y<-40){b.y=tc2.height+20;b.x=Math.random()*tc2.width;}
+    tctx.save();tctx.globalAlpha=.18;
+    tctx.beginPath();tctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+    tctx.fillStyle='rgba(180,220,255,.3)';tctx.fill();
+    tctx.restore();
+  });
+  requestAnimationFrame(animT);
+})();
+
+// ════════════════ DRESS-UP ════════════════
+let dTab='color';
+const dC=document.getElementById('dress-canvas');
+const dCtx=dC.getContext('2d');
+
+function goToDress(){
+  document.getElementById('title').style.display='none';
+  document.getElementById('dress').classList.add('on');
+  renderDressPreview();renderDGrid();
+}
+function renderDressPreview(){
+  dCtx.clearRect(0,0,200,140);
+  const bg=dCtx.createRadialGradient(100,70,0,100,70,110);
+  bg.addColorStop(0,'#0a3a6a');bg.addColorStop(1,'#021222');
+  dCtx.fillStyle=bg;dCtx.fillRect(0,0,200,140);
+  for(let i=0;i<4;i++){
+    const bx=20+i*46+Math.sin(G.tick*.05+i)*6;
+    const by=120-((G.tick*(.4+i*.15)+i*28)%110);
+    dCtx.save();dCtx.globalAlpha=.18;
+    dCtx.beginPath();dCtx.arc(bx,by,3+i,0,Math.PI*2);
+    dCtx.fillStyle='rgba(255,255,255,.3)';dCtx.fill();dCtx.restore();
+  }
+  let bc=G.bodyColor,be=G.bellyColor;
+  if(G.specialColor==='rainbow'){bc=getRainbow(G.rainbowT);be=getRainbow(G.rainbowT+1.5);}
+  if(G.specialColor==='galaxy'){bc=`hsl(${(G.tick*.8)%360},70%,30%)`;be=`hsl(${(G.tick*.8+60)%360},60%,60%)`;}
+  drawWhale(dCtx,100,74,.82,bc,be);
+  document.getElementById('d-wname').textContent=WHALE_TYPES[G.whaleType].name;
+}
+function setDTab(t){
+  dTab=t;
+  document.querySelectorAll('.dtab').forEach((el,i)=>el.classList.toggle('on',['color','acc'][i]===t));
+  renderDGrid();
+}
+function renderDGrid(){
+  const g=document.getElementById('dgrid');g.innerHTML='';
+  const items=dTab==='color'?COLORS:ACCS;
+  items.forEach(item=>{
+    const on=dTab==='color'?G.equippedColor===item.id:G.equippedAccs.has(item.id);
+    const d=document.createElement('div');
+    d.className='ditem'+(on?' on':'');
+    d.innerHTML=`<span class="ditem-e">${item.emoji}</span><span class="ditem-n">${item.name}</span>`;
+    d.onclick=()=>{
+      if(dTab==='color'){
+        G.equippedColor=item.id;G.bodyColor=item.body;G.bellyColor=item.belly;
+        G.specialColor=item.special||null;G.rainbowT=0;
+      } else {
+        if(G.equippedAccs.has(item.id)) G.equippedAccs.delete(item.id);
+        else G.equippedAccs.add(item.id);
+      }
+      renderDGrid();
+    };
+    g.appendChild(d);
+  });
+}
+function startGame(){
+  document.getElementById('dress').classList.remove('on');
   document.getElementById('hud').style.display='flex';
+  document.getElementById('cave-btn').classList.add('on');
+  document.getElementById('cave-lbl').classList.add('on');
   initWorld();
-  initTouchControls();
-  loop();
-  showCave(); // start in cave
+  initTouch();
+  updateHUD();
+  requestAnimationFrame(loop);
+  setTimeout(()=>showFact({e:'🌊',ttl:'Let\'s go!',t:'Swim around and collect ⭐ stars! Talk to your ocean friends! Visit your cave any time!'}),1200);
 }
 
+// ════════════════ WORLD ════════════════
 function initWorld(){
-  // Items
   G.items=[];
-  for(let i=0;i<280;i++){
-    const c=COLLECTIBLES[Math.floor(Math.random()*COLLECTIBLES.length)];
-    G.items.push({...c,iid:i,
-      x:120+Math.random()*(WORLD-240),y:120+Math.random()*(WORLD-240),
-      collected:false, wobble:Math.random()*Math.PI*2, ws:0.025+Math.random()*0.03});
+  for(let i=0;i<300;i++){
+    const id=SPAWN_IDS[Math.floor(Math.random()*SPAWN_IDS.length)];
+    const def=COLLECT_DEF[id];
+    G.items.push({id,iid:i,x:100+Math.random()*(WORLD-200),y:100+Math.random()*(WORLD-200),
+      collected:false,wobble:Math.random()*Math.PI*2,ws:.022+Math.random()*.03,
+      size:def.size,main:def.main});
   }
-  // Decor
-  G.decorPts=[];
-  const decors=['🪨','🌿','🐡','🦈','🐡','🐠','🦐','🪸'];
-  for(let i=0;i<180;i++){
-    G.decorPts.push({emoji:decors[Math.floor(Math.random()*decors.length)],
-      x:60+Math.random()*(WORLD-120),y:60+Math.random()*(WORLD-120),
-      size:28+Math.random()*20});
-  }
-  // NPCs spread around world
+  G.decor=[];
+  const types=['rock','weed'];
+  for(let i=0;i<80;i++) G.decor.push({type:types[i%2],x:60+Math.random()*(WORLD-120),y:60+Math.random()*(WORLD-120),s:.6+Math.random()*.8,seed:Math.random()*100});
   G.npcs=NPC_DEFS.map((def,i)=>{
-    const angle=(i/NPC_DEFS.length)*Math.PI*2;
-    const r=480+Math.random()*320;
-    return{...def,
-      x:G.homeX+Math.cos(angle)*r, y:G.homeY+Math.sin(angle)*r,
-      wobble:Math.random()*Math.PI*2, talked:false, questGiven:false};
+    const a=(i/NPC_DEFS.length)*Math.PI*2,r=480+Math.random()*300;
+    return{...def,x:G.homeX+Math.cos(a)*r,y:G.homeY+Math.sin(a)*r,wobble:Math.random()*Math.PI*2,questGiven:false};
   });
-  updateQuestHUD();
+  updateQHUD();
 }
 
-// ════════════════════════════════════════════════════
-//  CAVE / SHOP
-// ════════════════════════════════════════════════════
-let activeTab='colors';
-function showCave(){
-  document.getElementById('cave-screen').style.display='flex';
-  document.getElementById('cave-gold-display').textContent='⭐ '+G.stars+' Stars';
-  renderShop();
+// ════════════════ CAVE ════════════════
+let cTab='whale';
+function openCave(){
+  G.caveOpen=true;
+  document.getElementById('cave').classList.add('on');
+  document.getElementById('cave-gold').textContent='⭐ '+G.stars+' Stars';
+  renderCave();
 }
-function leaveCave(){
-  document.getElementById('cave-screen').style.display='none';
+function closeCave(){
+  G.caveOpen=false;
+  document.getElementById('cave').classList.remove('on');
 }
-function showTab(tab){
-  activeTab=tab;
-  document.querySelectorAll('.cave-tab').forEach((t,i)=>{
-    t.classList.toggle('active',['whales','colors','accessories','powers'][i]===tab);
-  });
-  renderShop();
+function setCTab(t){
+  cTab=t;
+  document.querySelectorAll('.ctab').forEach((el,i)=>el.classList.toggle('on',['whale','color','acc','power'][i]===t));
+  renderCave();
 }
-function renderShop(){
-  const grid=document.getElementById('shop-grid');
-  grid.innerHTML='';
-  if(activeTab==='whales'){
+function renderCave(){
+  document.getElementById('cave-gold').textContent='⭐ '+G.stars+' Stars';
+  const grid=document.getElementById('cgrid');grid.innerHTML='';
+  if(cTab==='whale'){
     Object.entries(WHALE_TYPES).forEach(([id,wt])=>{
-      const owned=G.ownedWhales.has(id);
-      const equipped=G.whaleType===id;
-      const div=document.createElement('div');
-      div.className='shop-item'+(equipped?' equipped':owned?' owned':'');
-      div.innerHTML=`<span class="shop-emoji">${wt.desc.includes('unicorn')?'🦄':wt.desc.includes('biggest')?'🐋':wt.desc.includes('smart')?'🐋':wt.desc.includes('Canary')?'⚪':'🐋'}</span>
-        <div class="shop-name">${wt.name}</div>
-        <div class="shop-cost">${owned?(equipped?'✅ Swimming!':'Tap to switch'):'⭐ '+wt.cost}</div>
-        <div class="shop-desc">${wt.desc}</div>`;
-      div.onclick=()=>buyEquipWhale(id,wt);
-      grid.appendChild(div);
+      const owned=G.ownedWhales.has(id),on=G.whaleType===id;
+      const d=mkCI(wt.emoji,wt.name,owned?(on?'✅ You are this!':'Tap to switch'):'⭐ '+wt.cost,on?'equipped':owned?'owned':'',wt.desc);
+      d.onclick=()=>buyWhale(id,wt);grid.appendChild(d);
+    });
+  } else if(cTab==='color'){
+    COLORS.forEach(c=>{
+      const owned=G.ownedColors.has(c.id),on=G.equippedColor===c.id;
+      const d=mkCI(c.emoji,c.name,owned?(on?'✅ On!':'Tap to wear'):'⭐ '+c.cost,on?'equipped':owned?'owned':'','');
+      d.onclick=()=>buyColor(c);grid.appendChild(d);
+    });
+  } else if(cTab==='acc'){
+    ACCS.forEach(a=>{
+      const owned=G.ownedAccs.has(a.id),on=G.equippedAccs.has(a.id);
+      const d=mkCI(a.emoji,a.name,owned?(on?'✅ On!':'Tap to toggle'):'⭐ '+a.cost,on?'equipped':owned?'owned':'','');
+      d.onclick=()=>buyAcc(a);grid.appendChild(d);
     });
   } else {
-    const items=SHOP_ITEMS[activeTab==='powers'?'powers':activeTab==='accessories'?'accessories':'colors'];
-    items.forEach(item=>{
-      const owned=G.ownedItems.has(item.id);
-      const equipped=G.equippedColor===item.id||G.equippedAccs.has(item.id)||G.ownedPowers[item.id];
-      const div=document.createElement('div');
-      div.className='shop-item'+(equipped?' equipped':owned?' owned':'');
-      div.innerHTML=`<span class="shop-emoji">${item.emoji}</span>
-        <div class="shop-name">${item.name}</div>
-        <div class="shop-cost">${owned?'✅ Owned':'⭐ '+item.cost}</div>
-        ${item.desc?`<div class="shop-desc">${item.desc}</div>`:''}
-        ${item.key?`<div class="shop-desc">Press [${item.key}] to use!</div>`:''}`;
-      div.onclick=()=>buyOrEquip(item);
-      grid.appendChild(div);
+    POWERS.forEach(p=>{
+      const owned=G.ownedPowers[p.id];
+      const d=mkCI(p.emoji,p.name,owned?'✅ Got it!':'⭐ '+p.cost,owned?'owned':'',p.desc);
+      d.onclick=()=>buyPower(p);grid.appendChild(d);
     });
   }
-  document.getElementById('cave-gold-display').textContent='⭐ '+G.stars+' Stars';
 }
-function buyOrEquip(item){
-  if(!G.ownedItems.has(item.id)){
-    if(G.stars<item.cost){showFact({e:'😅',t:'You need more stars! Go explore and collect treasures!',title:'Not enough stars!'});return;}
-    G.stars-=item.cost;
-    G.ownedItems.add(item.id);
-    spawnSparkles(window.innerWidth/2,window.innerHeight/2,8);
-    showFact({e:item.emoji,t:'You got: '+item.name+'! Awesome!',title:'New item!'});
-  }
-  // equip
-  if(item.type==='color'){
-    G.equippedColor=item.id;
-    G.bodyColor=item.bodyColor; G.bellyColor=item.bellyColor;
-    G.specialColor=item.special||null;
-    G.colorRainbowT=0;
-  }else if(item.type==='acc'){
-    const key=item.id;
-    if(G.equippedAccs.has(key)) G.equippedAccs.delete(key);
-    else G.equippedAccs.add(key);
-  }else if(item.type==='power'){
-    G.ownedPowers[item.id]=true;
-  }
-  updateHUD();
-  renderShop();
-  updatePowerBar();
+function mkCI(emoji,name,cost,cls,desc){
+  const d=document.createElement('div');
+  d.className='citem'+(cls?' '+cls:'');
+  d.innerHTML=`<span class="ci-e">${emoji}</span><div class="ci-n">${name}</div><div class="ci-c">${cost}</div>${desc?`<div class="ci-d">${desc}</div>`:''}`;
+  return d;
 }
-
-function buyEquipWhale(id,wt){
+function cantAfford(){showFact({e:'😅',ttl:'Need more stars!',t:'Collect more ⭐ stars then come back!'});}
+function buyWhale(id,wt){
   if(!G.ownedWhales.has(id)){
-    if(G.stars<wt.cost){showFact({e:'😅',t:'You need more stars! Keep collecting!',title:'Not enough stars!'});return;}
-    G.stars-=wt.cost;
-    G.ownedWhales.add(id);
+    if(G.stars<wt.cost){cantAfford();return;}
+    G.stars-=wt.cost;G.ownedWhales.add(id);
     spawnSparkles(window.innerWidth/2,window.innerHeight/2,12);
-    showFact({e:'🐋',t:'You unlocked the '+wt.name+'! '+wt.desc,title:'New Whale!'});
+    showFact({e:'🐋',ttl:'New Whale!',t:'You got the '+wt.name+'! '+wt.desc});
   }
-  // Switch to this whale type and reset to its natural colors
-  G.whaleType=id;
-  G.bodyColor=wt.body; G.bellyColor=wt.belly;
-  G.equippedColor=null; G.specialColor=null; G.colorRainbowT=0;
-  updateHUD();
-  renderShop();
+  G.whaleType=id;G.bodyColor=wt.body;G.bellyColor=wt.belly;
+  G.equippedColor=null;G.specialColor=null;G.rainbowT=0;
+  updateHUD();renderCave();
+}
+function buyColor(c){
+  if(!G.ownedColors.has(c.id)&&c.cost>0){
+    if(G.stars<c.cost){cantAfford();return;}
+    G.stars-=c.cost;G.ownedColors.add(c.id);
+    spawnSparkles(window.innerWidth/2,window.innerHeight/2,8);
+  }
+  G.equippedColor=c.id;G.bodyColor=c.body;G.bellyColor=c.belly;
+  G.specialColor=c.special||null;G.rainbowT=0;
+  updateHUD();renderCave();
+}
+function buyAcc(a){
+  if(!G.ownedAccs.has(a.id)){
+    if(G.stars<a.cost){cantAfford();return;}
+    G.stars-=a.cost;G.ownedAccs.add(a.id);
+    spawnSparkles(window.innerWidth/2,window.innerHeight/2,6);
+  }
+  if(G.equippedAccs.has(a.id)) G.equippedAccs.delete(a.id);
+  else G.equippedAccs.add(a.id);
+  updateHUD();renderCave();
+}
+function buyPower(p){
+  if(!G.ownedPowers[p.id]){
+    if(G.stars<p.cost){cantAfford();return;}
+    G.stars-=p.cost;G.ownedPowers[p.id]=true;
+    spawnSparkles(window.innerWidth/2,window.innerHeight/2,8);
+    showFact({e:p.emoji,ttl:'New Power!',t:'You got: '+p.name+'! '+p.desc});
+  }
+  updateHUD();renderCave();buildTPowers();
 }
 
-// ════════════════════════════════════════════════════
-//  DIALOGUE
-// ════════════════════════════════════════════════════
-let pendingQuestNPC=null;
-function openDlg(npc,text,sub,showAccept,fact){
-  document.getElementById('dlg-avatar').textContent=npc.emoji;
-  document.getElementById('dlg-name').textContent=npc.name;
-  document.getElementById('dlg-text').textContent=text;
+// ════════════════ DIALOGUE ════════════════
+let pendingQ=null;
+function openDlg(npc,txt,sub,showAcc,fact){
+  document.getElementById('dlg-av').textContent=npc.emoji;
+  document.getElementById('dlg-who').textContent=npc.name;
+  document.getElementById('dlg-txt').textContent=txt;
   document.getElementById('dlg-sub').textContent=sub||'';
-  document.getElementById('dlg-accept').style.display=showAccept?'inline-block':'none';
-  // Embed whale fact directly in dialogue if provided
-  const factEl=document.getElementById('dlg-fact');
+  document.getElementById('dlg-acc').style.display=showAcc?'inline-block':'none';
+  const fEl=document.getElementById('dlg-fact');
   if(fact){
-    document.getElementById('dlg-fact-title').textContent=fact.e+' Did You Know?';
-    document.getElementById('dlg-fact-text').textContent=fact.t;
-    factEl.style.display='block';
-  } else {
-    factEl.style.display='none';
-  }
-  document.getElementById('dialogue').classList.add('open');
+    document.getElementById('dlg-fact-ttl').textContent=fact.e+' Did You Know?';
+    document.getElementById('dlg-fact-txt').textContent=fact.t;
+    fEl.style.display='block';
+  } else fEl.style.display='none';
+  document.getElementById('dlg').classList.add('on');
   G.dlgOpen=true;
 }
 function closeDlg(){
-  document.getElementById('dialogue').classList.remove('open');
-  G.dlgOpen=false;
-  pendingQuestNPC=null;
+  document.getElementById('dlg').classList.remove('on');
+  G.dlgOpen=false;pendingQ=null;
 }
 function acceptQuest(){
   closeDlg();
-  if(pendingQuestNPC) giveQuest(pendingQuestNPC);
+  if(pendingQ){G.quest={npc:pendingQ.npc,qt:pendingQ.qt};G.questProg=0;pendingQ.npc.questGiven=true;updateQHUD();}
 }
 function talkToNPC(npc){
   if(G.dlgOpen)return;
-  // Pick an unseen whale fact to show inside this dialogue
-  const notSeen=[...Array(WHALE_FACTS.length).keys()].filter(i=>!G.factsShown.has(i));
-  const fi=notSeen.length>0?notSeen[Math.floor(Math.random()*notSeen.length)]:Math.floor(Math.random()*WHALE_FACTS.length);
+  const unseen=[...Array(FACTS.length).keys()].filter(i=>!G.factsShown.has(i));
+  const fi=unseen.length>0?unseen[Math.floor(Math.random()*unseen.length)]:Math.floor(Math.random()*FACTS.length);
   G.factsShown.add(fi);
-  const fact=WHALE_FACTS[fi];
-
-  // Quest complete?
-  if(G.quest && G.questProgress>=G.quest.qt.count && G.quest.npc.id===npc.id){
-    G.stars+=G.quest.qt.reward;
-    spawnSparkles(npc.x-(G.x-canvas.width/2),npc.y-(G.y-canvas.height/2),12);
-    showLevelCheck();
+  const fact=FACTS[fi];
+  if(G.quest&&G.questProg>=G.quest.qt.count&&G.quest.npc.id===npc.id){
+    G.stars+=G.quest.qt.reward;gainXP(12);updateHUD();
+    spawnSparkles(gc.width/2,gc.height/2,14);
     npc.questGiven=false;
-    openDlg(npc,npc.questLines[1],'⭐ +'+G.quest.qt.reward+' Stars earned!',false,fact);
-    G.quest=null; G.questProgress=0;
-    updateQuestHUD(); updateHUD();
-    return;
+    openDlg(npc,npc.qLines[1],'You got ⭐'+G.quest.qt.reward+' stars! Yay!',false,fact);
+    G.quest=null;G.questProg=0;updateQHUD();return;
   }
-  // Give new quest?
-  if(!G.quest && !npc.questGiven){
-    const qtemplate=QUEST_TEMPLATES.filter(q=>q.giver===npc.id);
-    if(qtemplate.length>0){
-      const qt=qtemplate[Math.floor(Math.random()*qtemplate.length)];
-      pendingQuestNPC={npc,qt};
-      openDlg(npc,npc.questLines[0],
-        '📜 Quest: '+qt.text.replace('{n}',qt.count)+' (Reward: ⭐'+qt.reward+')',true,fact);
+  if(!G.quest&&!npc.questGiven){
+    const pool=QUEST_T.filter(q=>q.giver===npc.id);
+    if(pool.length){
+      const qt=pool[Math.floor(Math.random()*pool.length)];
+      pendingQ={npc,qt};
+      openDlg(npc,npc.qLines[0],'📜 '+qt.text.replace('{n}',qt.count)+' — You get ⭐'+qt.reward+'!',true,fact);
       return;
     }
   }
-  // Just chatting
-  const line=npc.lines[Math.floor(Math.random()*npc.lines.length)];
-  openDlg(npc,line,'',false,fact);
+  openDlg(npc,npc.lines[Math.floor(Math.random()*npc.lines.length)],'',false,fact);
 }
-function giveQuest(data){
-  G.quest={npc:data.npc, qt:data.qt};
-  G.questProgress=0;
-  data.npc.questGiven=true;
-  updateQuestHUD();
-}
-function updateQuestHUD(){
-  const el=document.getElementById('quest-hud');
-  if(!G.quest){el.classList.remove('open');return;}
-  el.classList.add('open');
-  const txt=G.quest.qt.text.replace('{n}',G.quest.qt.count);
-  document.getElementById('qh-text').textContent=txt;
-  document.getElementById('qh-title').textContent='📜 Quest from '+G.quest.npc.name+'!';
-  const pct=Math.min(100,G.questProgress/G.quest.qt.count*100);
+function updateQHUD(){
+  const el=document.getElementById('qhud');
+  if(!G.quest){el.classList.remove('on');return;}
+  el.classList.add('on');
+  document.getElementById('qh-who').textContent='📜 '+G.quest.npc.name+' needs help!';
+  document.getElementById('qh-text').textContent=G.quest.qt.text.replace('{n}',G.quest.qt.count);
+  const pct=Math.min(100,G.questProg/G.quest.qt.count*100);
   document.getElementById('qh-bar').style.width=pct+'%';
-  document.getElementById('qh-count').textContent=G.questProgress+' / '+G.quest.qt.count;
+  document.getElementById('qh-cnt').textContent=G.questProg+' out of '+G.quest.qt.count;
 }
 
-// ════════════════════════════════════════════════════
-//  FACT POPUP
-// ════════════════════════════════════════════════════
+// ════════════════ FACTS ════════════════
 let factTO=null;
 function showFact(f){
-  document.getElementById('fact-emoji').textContent=f.e;
-  document.getElementById('fact-title').textContent=f.title||'Did You Know?';
-  document.getElementById('fact-text').textContent=f.t;
-  const el=document.getElementById('fact-pop');
-  el.classList.add('open');
+  document.getElementById('fact-ico').textContent=f.e;
+  document.getElementById('fact-ttl').textContent=f.ttl||'Did You Know?';
+  document.getElementById('fact-txt').textContent=f.t;
+  document.getElementById('fact').classList.add('on');
   if(factTO)clearTimeout(factTO);
-  factTO=setTimeout(()=>el.classList.remove('open'),8000);
+  factTO=setTimeout(dismissFact,9000);
 }
-// tap fact popup to dismiss early
-document.getElementById('fact-pop').addEventListener('click',()=>{
-  document.getElementById('fact-pop').classList.remove('open');
+function dismissFact(){
+  document.getElementById('fact').classList.remove('on');
   if(factTO){clearTimeout(factTO);factTO=null;}
-});
+}
 
-// ════════════════════════════════════════════════════
-//  LEVEL / XP
-// ════════════════════════════════════════════════════
-function gainXP(amount){
-  G.xp+=amount;
-  if(G.xp>=G.xpNext){G.xp-=G.xpNext;G.level++;G.xpNext=Math.floor(G.xpNext*1.4);showLevelUp();}
+// ════════════════ LEVEL / HUD ════════════════
+function gainXP(n){
+  G.xp+=n;
+  if(G.xp>=G.xpNext){G.xp-=G.xpNext;G.level++;G.xpNext=Math.floor(G.xpNext*1.4);G.stars+=5;showLevelUp();}
 }
 function showLevelUp(){
-  const el=document.getElementById('levelup');
-  document.getElementById('lvl-text').textContent='⭐ LEVEL '+G.level+'! ⭐';
-  document.getElementById('lvl-sub').textContent='You are getting so strong!';
-  el.classList.add('open');
-  setTimeout(()=>el.classList.remove('open'),2200);
-  spawnSparkles(window.innerWidth/2,window.innerHeight/2,16);
-  G.stars+=5;
+  document.getElementById('lvl-t').textContent='🌟 Level '+G.level+'! 🌟';
+  document.getElementById('lvl-s').textContent='Wow! You got 5 bonus stars!';
+  const el=document.getElementById('lvlup');
+  el.classList.add('on');setTimeout(()=>el.classList.remove('on'),2600);
+  spawnSparkles(gc.width/2,gc.height/2,22);
 }
-function showLevelCheck(){gainXP(10);}
+function updateHUD(){
+  document.getElementById('hud-stars').textContent='⭐ '+G.stars;
+  document.getElementById('hud-name').textContent=WHALE_TYPES[G.whaleType].name+' · Level '+G.level;
+}
 
-// ════════════════════════════════════════════════════
-//  SPARKLES
-// ════════════════════════════════════════════════════
-const SPARKLE_EMOJIS=['✨','⭐','💫','🌟','💎','🔮','🫧'];
+// ════════════════ SPARKLES ════════════════
 function spawnSparkles(sx,sy,n){
+  const es=['⭐','✨','💫','🌟'];
   for(let i=0;i<n;i++){
     setTimeout(()=>{
-      const s=document.createElement('div');
-      s.className='sp';
-      s.textContent=SPARKLE_EMOJIS[Math.floor(Math.random()*SPARKLE_EMOJIS.length)];
-      s.style.left=(sx+(Math.random()-.5)*160)+'px';
-      s.style.top=(sy+(Math.random()-.5)*100)+'px';
-      document.body.appendChild(s);
-      setTimeout(()=>s.remove(),900);
-    },i*60);
+      const s=document.createElement('div');s.className='sp';
+      s.textContent=es[Math.floor(Math.random()*es.length)];
+      s.style.left=(sx+(Math.random()-.5)*200)+'px';
+      s.style.top=(sy+(Math.random()-.5)*130)+'px';
+      document.body.appendChild(s);setTimeout(()=>s.remove(),900);
+    },i*55);
   }
 }
 
-// ════════════════════════════════════════════════════
-//  POWERS
-// ════════════════════════════════════════════════════
-function updatePowerBar(){
-  const bar=document.getElementById('power-bar');
-  bar.innerHTML='';
-  const powers=SHOP_ITEMS.powers.filter(p=>G.ownedPowers[p.id]);
-  powers.forEach(p=>{
-    const pip=document.createElement('div');
-    pip.className='power-pip'+(G.activePower===p.id&&G.powerTimer>0?' active':'');
-    pip.innerHTML=p.emoji+'<span class="pip-key">['+p.key+']</span>';
-    bar.appendChild(pip);
-  });
-  // also refresh touch power buttons
-  if(document.getElementById('touch-controls').style.display!=='none') buildTouchPowers();
-}
+// ════════════════ POWERS ════════════════
 function usePower(key){
-  const powers=SHOP_ITEMS.powers.filter(p=>G.ownedPowers[p.id]);
-  const p=powers.find(pw=>pw.key===key);
+  const p=POWERS.find(pw=>pw.key===key&&G.ownedPowers[pw.id]);
   if(!p||G.powerTimer>0)return;
-  G.activePower=p.id; G.powerTimer=180;
-  spawnSparkles(canvas.width/2,canvas.height/2,6);
-  updatePowerBar();
+  G.activePower=p.id;G.powerTimer=190;
+  spawnSparkles(gc.width/2,gc.height/2,5);
+}
+function buildTPowers(){
+  const c=document.getElementById('tc-powers');c.innerHTML='';
+  POWERS.filter(p=>G.ownedPowers[p.id]).forEach(p=>{
+    const btn=document.createElement('button');
+    btn.className='tpbtn'+(G.activePower===p.id&&G.powerTimer>0?' active':'');
+    btn.textContent=p.emoji;
+    btn.addEventListener('touchstart',e=>{e.preventDefault();usePower(p.key);},{passive:false});
+    btn.onclick=()=>usePower(p.key);
+    c.appendChild(btn);
+  });
 }
 
-// ════════════════════════════════════════════════════
-//  INPUT
-// ════════════════════════════════════════════════════
+// ════════════════ INPUT ════════════════
 window.addEventListener('keydown',e=>{
   KEYS[e.key]=true;
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();
-  if(e.key===' ')tryInteract();
+  if(e.key===' '||e.key==='e'||e.key==='E'){if(G.nearNPC)talkToNPC(G.nearNPC);}
   if(['1','2','3','4'].includes(e.key))usePower(e.key);
-  if(e.key==='e'||e.key==='E')tryInteract();
 });
-window.addEventListener('keyup',e=>{KEYS[e.key]=false;});
-function tryInteract(){
-  if(G.nearNPC)talkToNPC(G.nearNPC);
-  else if(G.nearHome)showCave();
+window.addEventListener('keyup',e=>KEYS[e.key]=false);
+
+// ════════════════ DRAG-TO-SWIM ════════════════
+const drag={active:false,id:null,sx:0,sy:0,dx:0,dy:0};
+const DRAG_FULL=65;
+const canvas=document.getElementById('gc');
+
+function initTouch(){
+  if(!isTouchDevice())return;
+  document.getElementById('tc').style.display='block';
+  const ripple=document.getElementById('drag-ripple');
+  canvas.addEventListener('touchstart',e=>{
+    if(G.dlgOpen||G.caveOpen)return;
+    e.preventDefault();
+    const t=e.changedTouches[0];
+    drag.active=true;drag.id=t.identifier;
+    drag.sx=t.clientX;drag.sy=t.clientY;drag.dx=0;drag.dy=0;
+    ripple.style.left=t.clientX+'px';ripple.style.top=t.clientY+'px';
+    ripple.style.display='block';ripple.style.opacity='1';
+  },{passive:false});
+  canvas.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    for(const t of e.changedTouches){
+      if(t.identifier!==drag.id)continue;
+      drag.dx=t.clientX-drag.sx;drag.dy=t.clientY-drag.sy;
+      ripple.style.left=t.clientX+'px';ripple.style.top=t.clientY+'px';
+    }
+  },{passive:false});
+  function endDrag(e){
+    for(const t of e.changedTouches){
+      if(t.identifier!==drag.id)continue;
+      const mag=Math.sqrt(drag.dx*drag.dx+drag.dy*drag.dy);
+      if(mag<14&&G.nearNPC)talkToNPC(G.nearNPC);
+      drag.active=false;drag.dx=0;drag.dy=0;
+      ripple.style.opacity='0';
+      setTimeout(()=>{ripple.style.display='none';},150);
+    }
+  }
+  canvas.addEventListener('touchend',endDrag,{passive:false});
+  canvas.addEventListener('touchcancel',endDrag,{passive:false});
+}
+function applyDrag(){
+  if(!drag.active)return;
+  const mag=Math.sqrt(drag.dx*drag.dx+drag.dy*drag.dy);
+  if(mag<8)return;
+  const sc=Math.min(1,mag/DRAG_FULL);
+  G.vx+=(drag.dx/mag)*SPEED*sc*1.2;
+  G.vy+=(drag.dy/mag)*SPEED*sc*1.2;
 }
 
-// ════════════════════════════════════════════════════
-//  UPDATE
-// ════════════════════════════════════════════════════
-const SPEED=3.8, FRICTION=0.87, MAX_V=7;
-const canvas=document.getElementById('gameCanvas');
-const ctx=canvas.getContext('2d');
-
-function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
-resizeCanvas();
-window.addEventListener('resize',resizeCanvas);
+// ════════════════ UPDATE ════════════════
+const SPEED=3.8,FRICTION=.87,MAXV=7;
 
 function update(){
-  const g=G; g.tick++;
-  if(g.dlgOpen)return; // pause movement during dialogue
+  G.tick++;
+  if(G.dlgOpen||G.caveOpen){
+    // still animate dress preview when in dress screen
+    if(document.getElementById('dress').classList.contains('on')){
+      if(G.specialColor==='rainbow')G.rainbowT+=.022;
+      renderDressPreview();
+    }
+    return;
+  }
+  if(G.specialColor==='rainbow')G.rainbowT+=.022;
 
-  // Power effects
-  if(g.powerTimer>0)g.powerTimer--;
-  const spd_mult=g.activePower==='p_speed'&&g.powerTimer>0?2.2:1;
+  if(G.powerTimer>0)G.powerTimer--;
+  if(G.powerTimer===0&&G.activePower){G.activePower=null;buildTPowers();}
+  const sm=G.activePower==='p_speed'&&G.powerTimer>0?2.2:1;
 
   const up=KEYS['ArrowUp']||KEYS['w']||KEYS['W'];
-  const down=KEYS['ArrowDown']||KEYS['s']||KEYS['S'];
-  const left=KEYS['ArrowLeft']||KEYS['a']||KEYS['A'];
-  const right=KEYS['ArrowRight']||KEYS['d']||KEYS['D'];
+  const dn=KEYS['ArrowDown']||KEYS['s']||KEYS['S'];
+  const lt=KEYS['ArrowLeft']||KEYS['a']||KEYS['A'];
+  const rt=KEYS['ArrowRight']||KEYS['d']||KEYS['D'];
+  if(up)G.vy-=SPEED*sm;if(dn)G.vy+=SPEED*sm;
+  if(lt)G.vx-=SPEED*sm;if(rt)G.vx+=SPEED*sm;
+  applyDrag();
+  G.vx*=FRICTION;G.vy*=FRICTION;
+  const sp=Math.sqrt(G.vx*G.vx+G.vy*G.vy);
+  if(sp>MAXV*sm){G.vx=G.vx/sp*MAXV*sm;G.vy=G.vy/sp*MAXV*sm;}
+  if(sp>.4)G.angle=Math.atan2(G.vy,G.vx);
+  G.x=Math.max(80,Math.min(WORLD-80,G.x+G.vx));
+  G.y=Math.max(80,Math.min(WORLD-80,G.y+G.vy));
 
-  if(up)   g.vy-=SPEED*spd_mult;
-  if(down) g.vy+=SPEED*spd_mult;
-  if(left) g.vx-=SPEED*spd_mult;
-  if(right)g.vx+=SPEED*spd_mult;
-
-  // Touch joystick input
-  applyTouchInput();
-
-  g.vx*=FRICTION; g.vy*=FRICTION;
-  const sp=Math.sqrt(g.vx*g.vx+g.vy*g.vy);
-  if(sp>MAX_V*spd_mult){g.vx=g.vx/sp*MAX_V*spd_mult;g.vy=g.vy/sp*MAX_V*spd_mult;}
-  if(sp>0.4)g.angle=Math.atan2(g.vy,g.vx);
-
-  g.x=Math.max(80,Math.min(WORLD-80,g.x+g.vx));
-  g.y=Math.max(80,Math.min(WORLD-80,g.y+g.vy));
-
-  // Magnet power
-  if(g.activePower==='p_magnet'&&g.powerTimer>0){
-    g.items.forEach(it=>{
-      if(it.collected)return;
-      const dx=it.x-g.x,dy=it.y-g.y,d=Math.sqrt(dx*dx+dy*dy);
-      if(d<280){it.x-=dx/d*4;it.y-=dy/d*4;}
-    });
+  if(G.activePower==='p_magnet'&&G.powerTimer>0){
+    G.items.forEach(it=>{if(it.collected)return;const dx=it.x-G.x,dy=it.y-G.y,d=Math.sqrt(dx*dx+dy*dy);if(d<300){it.x-=dx/d*5;it.y-=dy/d*5;}});
   }
 
-  // Wobble collectibles
-  g.items.forEach(it=>{it.wobble+=it.ws;});
-  g.npcs.forEach(npc=>{npc.wobble+=0.02;});
-  if(g.specialColor==='rainbow')g.colorRainbowT+=0.02;
+  G.items.forEach(it=>it.wobble+=it.ws);
+  G.npcs.forEach(n=>n.wobble+=.018);
 
-  // Collect items
-  const collectR=g.activePower==='p_magnet'&&g.powerTimer>0?70:42;
-  let questCollected=false;
-  g.items.forEach(it=>{
+  // Collect — bigger radius for stars (easier to grab)
+  const cr=G.activePower==='p_magnet'&&G.powerTimer>0?75:44;
+  G.items.forEach(it=>{
     if(it.collected)return;
-    const dx=it.x-g.x,dy=it.y-g.y;
-    if(dx*dx+dy*dy<collectR*collectR){
+    const dx=it.x-G.x,dy=it.y-G.y;
+    if(dx*dx+dy*dy<cr*cr){
       it.collected=true;
-      G.stars+=it.points;
-      gainXP(it.points);
-      updateHUD();
-      showCollectPop(it.emoji+' +'+it.points);
-      spawnWorldParticles(it.x,it.y,it.emoji);
-      spawnBubbles(g.x,g.y,3);
-      if(g.quest&&it.id===g.quest.qt.target&&!questCollected){
-        g.questProgress=Math.min(g.questProgress+1,g.quest.qt.count);
-        questCollected=true;
-        updateQuestHUD();
-        if(g.questProgress>=g.quest.qt.count){
-          setTimeout(()=>showFact({e:'🎉',t:'Quest done! Go back to '+g.quest.npc.name+' to get your reward!',title:'Quest Complete!'}),400);
-        }
+      const def=COLLECT_DEF[it.id];
+      G.stars+=def.pts;gainXP(def.pts);updateHUD();
+      G.starBursts.push({wx:it.x,wy:it.y,txt:'+'+def.pts+'⭐',life:55,ml:55,big:def.main});
+      if(def.main)spawnSparkles(gc.width/2,gc.height/2,3);
+      spawnBubs(G.x,G.y,3);
+      if(G.quest&&it.id===G.quest.qt.target){
+        G.questProg=Math.min(G.questProg+1,G.quest.qt.count);updateQHUD();
+        if(G.questProg>=G.quest.qt.count)
+          setTimeout(()=>showFact({e:'🎉',ttl:'Quest done!',t:'Go back to '+G.quest.npc.name+'! They have stars for you!'}),400);
       }
     }
   });
 
-  // NPC proximity
-  g.nearNPC=null;
-  g.npcs.forEach(npc=>{
-    const dx=npc.x-g.x,dy=npc.y-g.y;
-    if(dx*dx+dy*dy<160*160)g.nearNPC=npc;
-  });
+  // NPC proximity — large, forgiving radius
+  G.nearNPC=null;
+  G.npcs.forEach(npc=>{const dx=npc.x-G.x,dy=npc.y-G.y;if(dx*dx+dy*dy<170*170)G.nearNPC=npc;});
 
-  // Home proximity
-  const hdx=g.homeX-g.x,hdy=g.homeY-g.y;
-  g.nearHome=hdx*hdx+hdy*hdy<160*160;
-
-  const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
   const hint=document.getElementById('hud-hint');
-  if(g.nearNPC) hint.textContent=isTouch?'Tap anywhere to talk to '+g.nearNPC.name+'!':'E to talk to '+g.nearNPC.name+'!';
-  else if(g.nearHome) hint.textContent=isTouch?'Tap anywhere to go into your cave!':'E to enter your cave!';
-  else if(!isTouch) hint.textContent='Arrow keys to swim • E = talk / enter cave';
+  hint.textContent=G.nearNPC?(isTouchDevice()?'Tap to talk!':'Press E to talk!'):'';
 
-  // Passive bubbles
-  if(sp>1&&g.tick%14===0)spawnBubbles(g.x,g.y,1);
-  if(g.activePower==='p_shield'&&g.powerTimer>0&&g.tick%6===0)spawnBubbles(g.x,g.y,2);
-  if(g.activePower==='p_glow'&&g.powerTimer>0&&g.tick%8===0)spawnBubbles(g.x,g.y,1);
+  if(sp>1&&G.tick%15===0)spawnBubs(G.x,G.y,1);
+  if(G.activePower==='p_shield'&&G.powerTimer>0&&G.tick%7===0)spawnBubs(G.x,G.y,2);
 
-  // Update bubbles
-  g.bubbles=g.bubbles.filter(b=>{
-    b.y-=b.speed;b.x+=Math.sin(b.t*0.09)*0.7;b.t++;b.life--;return b.life>0;
-  });
-  g.particles=g.particles.filter(p=>{
-    p.x+=p.vx;p.y+=p.vy;p.vy+=0.04;p.life--;p.alpha=p.life/p.maxLife;return p.life>0;
-  });
-
-  if(g.powerTimer===0&&g.activePower){g.activePower=null;updatePowerBar();}
-  updatePowerBar();
+  G.bubbles=G.bubbles.filter(b=>{b.y-=b.sp;b.x+=Math.sin(b.t*.09)*.6;b.t++;b.life--;return b.life>0;});
+  G.starBursts=G.starBursts.filter(s=>{s.life--;return s.life>0;});
 }
 
-function spawnBubbles(wx,wy,n){
-  for(let i=0;i<n;i++) G.bubbles.push({
-    x:wx+(Math.random()-.5)*30,y:wy+(Math.random()-.5)*20,
-    r:3+Math.random()*9,speed:0.7+Math.random()*0.9,life:80+Math.random()*60,t:0});
-}
-function spawnWorldParticles(wx,wy,emoji){
-  for(let i=0;i<7;i++){
-    const a=Math.random()*Math.PI*2,sp=1+Math.random()*3;
-    G.particles.push({x:wx,y:wy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,
-      emoji,life:40,maxLife:40,alpha:1});
-  }
+function spawnBubs(wx,wy,n){
+  for(let i=0;i<n;i++)G.bubbles.push({x:wx+(Math.random()-.5)*26,y:wy+(Math.random()-.5)*16,r:3+Math.random()*8,sp:.65+Math.random()*.8,life:75+Math.random()*50,t:0});
 }
 
-let popTO2=null;
-function showCollectPop(txt){
-  const el=document.getElementById('fact-pop');
-  // use a small inline toast instead
-  const toast=document.createElement('div');
-  toast.style.cssText=`position:fixed;top:${80+Math.random()*40}px;left:${40+Math.random()*200}px;
-    font-family:'Bubblegum Sans',cursive;font-size:22px;color:#ffd700;
-    text-shadow:0 0 10px #ffd700;pointer-events:none;z-index:800;
-    animation:spAnim .8s ease-out forwards;`;
-  toast.textContent=txt;
-  document.body.appendChild(toast);
-  setTimeout(()=>toast.remove(),900);
+// ════════════════ HELPERS ════════════════
+function getRainbow(t){return`rgb(${Math.floor(Math.sin(t)*127+128)},${Math.floor(Math.sin(t+2.094)*127+128)},${Math.floor(Math.sin(t+4.189)*127+128)})`;}
+function darken(hex){try{const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`rgb(${Math.floor(r*.58)},${Math.floor(g*.58)},${Math.floor(b*.58)})`;}catch{return'#222';}}
+
+// ════════════════ WHALE DRAW ════════════════
+function drawWhale(c,cx,cy,scale,bc,be){
+  const fin=darken(bc);
+  const wt=WHALE_TYPES[G.whaleType];
+  const sp=Math.sqrt(G.vx*G.vx+G.vy*G.vy);
+  const wag=Math.sin(G.tick*.18)*.2*(sp>.4?1:0);
+  c.save();c.translate(cx,cy);c.scale(scale,scale);
+  c.save();c.shadowColor='rgba(0,0,0,.22)';c.shadowBlur=14;c.shadowOffsetY=5;
+  c.save();c.translate(-78,0);c.rotate(wag);
+  c.beginPath();c.moveTo(0,0);c.bezierCurveTo(-28,-10,-36,-40,-18,-58);c.bezierCurveTo(-6,-30,8,-6,10,-2);c.closePath();c.fillStyle=bc;c.fill();
+  c.beginPath();c.moveTo(0,0);c.bezierCurveTo(-28,10,-36,40,-18,58);c.bezierCurveTo(-6,30,8,6,10,2);c.closePath();c.fillStyle=darken(bc);c.fill();
+  c.restore();
+  c.beginPath();c.moveTo(-8,22);c.bezierCurveTo(-32,60,-8,62,8,58);c.bezierCurveTo(18,46,16,30,14,22);c.closePath();c.fillStyle=fin;c.fill();
+  c.beginPath();c.ellipse(14,0,84,46,0,0,Math.PI*2);c.fillStyle=bc;c.fill();
+  c.beginPath();c.ellipse(22,18,60,24,-.12,0,Math.PI*2);c.fillStyle=be;c.fill();
+  c.beginPath();c.moveTo(10,-46);c.bezierCurveTo(38,-18,56,-6,60,-4);c.bezierCurveTo(42,-10,12,-10,10,-46);c.fillStyle=fin;c.fill();
+  c.restore();
+  if(wt.horn){c.strokeStyle='#d4af37';c.lineWidth=6;c.lineCap='round';c.beginPath();c.moveTo(82,-30);c.lineTo(130,14);c.stroke();}
+  c.beginPath();c.arc(74,-10,9,0,Math.PI*2);c.fillStyle='#fff';c.fill();
+  c.beginPath();c.arc(76,-10,5,0,Math.PI*2);c.fillStyle='#1a1a2e';c.fill();
+  c.beginPath();c.arc(78,-12,1.8,0,Math.PI*2);c.fillStyle='#fff';c.fill();
+  c.beginPath();c.arc(68,5,11,.1,Math.PI*.82);c.strokeStyle='rgba(10,40,80,.6)';c.lineWidth=2.5;c.stroke();
+  c.beginPath();c.ellipse(80,-33,7,4,0,0,Math.PI*2);c.fillStyle=fin;c.fill();
+  const apos={a_crown:[68,-55],a_hat:[67,-58],a_bow:[68,-46],a_glasses:[58,-10],a_flower:[78,-48],a_halo:[68,-62],a_party:[64,-56],a_magic:[40,-52]};
+  c.font='26px serif';c.textAlign='center';c.textBaseline='middle';
+  ACCS.forEach(a=>{if(!G.equippedAccs.has(a.id))return;const[ax,ay]=apos[a.id]||[60,-48];c.fillText(a.emoji,ax,ay);});
+  c.restore();
 }
 
-function updateHUD(){
-  document.getElementById('hud-stars').textContent='⭐ '+G.stars;
-  document.getElementById('hud-name').textContent='🐋 '+WHALE_TYPES[G.whaleType].name+' · Lv'+G.level;
-}
-
-// ════════════════════════════════════════════════════
-//  BACKGROUND WORLD TEXTURE (pre-render)
-// ════════════════════════════════════════════════════
-const bgCanvas=document.createElement('canvas');
-bgCanvas.width=WORLD;bgCanvas.height=WORLD;
-let bgReady=false;
-function buildBg(){
-  const bc=bgCanvas.getContext('2d');
-  const grad=bc.createLinearGradient(0,0,0,WORLD);
-  grad.addColorStop(0,'#1a7aad');
-  grad.addColorStop(0.25,'#0a4a7c');
-  grad.addColorStop(0.6,'#03224c');
-  grad.addColorStop(1,'#010e20');
-  bc.fillStyle=grad;bc.fillRect(0,0,WORLD,WORLD);
-  // Subtle grid variation
-  for(let tx=0;tx<WORLD/80;tx++){
-    for(let ty=0;ty<WORLD/80;ty++){
-      if(Math.random()>.96){
-        bc.fillStyle='rgba(255,255,255,0.025)';
-        bc.fillRect(tx*80,ty*80,80,80);
-      }
-    }
-  }
-  // Light rays
-  for(let i=0;i<24;i++){
-    const rx=Math.random()*WORLD;
-    const lg=bc.createLinearGradient(rx,0,rx+100,WORLD*.5);
-    lg.addColorStop(0,'rgba(255,255,255,0.055)');
-    lg.addColorStop(1,'transparent');
-    bc.save();bc.translate(rx,0);bc.rotate((Math.random()-.5)*.22);
-    bc.fillStyle=lg;bc.fillRect(-20,0,60,WORLD*.6);bc.restore();
-  }
-  // Zone indicators (darker deep zones)
-  bc.fillStyle='rgba(0,0,0,0.12)';
-  bc.fillRect(0,WORLD*.6,WORLD,WORLD*.4);
-  bgReady=true;
-}
-setTimeout(buildBg,100);
-
-// ════════════════════════════════════════════════════
-//  DRAW
-// ════════════════════════════════════════════════════
+// ════════════════ DRAW ════════════════
 function draw(){
-  const W=canvas.width,H=canvas.height;
+  const W=gc.width,H=gc.height;
   const camX=G.x-W/2,camY=G.y-H/2;
   ctx.clearRect(0,0,W,H);
-
-  // BG
   if(bgReady){
+    // Fill entire screen with deep ocean first so edges never show black
+    ctx.fillStyle='#010e20';ctx.fillRect(0,0,W,H);
     const sx=Math.max(0,camX),sy=Math.max(0,camY);
     const sw=Math.min(WORLD-sx,W),sh=Math.min(WORLD-sy,H);
-    ctx.drawImage(bgCanvas,sx,sy,sw,sh,sx-camX,sy-camY,sw,sh);
-  }else{
-    ctx.fillStyle='#03224c';ctx.fillRect(0,0,W,H);
-  }
+    if(sw>0&&sh>0) ctx.drawImage(bgC,sx,sy,sw,sh,sx-camX,sy-camY,sw,sh);
+  } else {ctx.fillStyle='#03224c';ctx.fillRect(0,0,W,H);}
+  // Soft world-edge vignette — NO strokeRect (causes white lines)
+  const edgePad=120;
+  [[0,-camY,'top'],[0,WORLD-camY-H,'bottom'],[-camX,0,'left'],[WORLD-camX-W,0,'right']].forEach(([dist,,side])=>{
+    if(dist>edgePad) return;
+    const alpha=Math.max(0,(edgePad-dist)/edgePad)*0.55;
+    ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle='#010e20';
+    if(side==='top')    ctx.fillRect(0,0,W,edgePad-dist);
+    if(side==='bottom') ctx.fillRect(0,H-(edgePad-dist),W,edgePad-dist);
+    if(side==='left')   ctx.fillRect(0,0,edgePad-dist,H);
+    if(side==='right')  ctx.fillRect(W-(edgePad-dist),0,edgePad-dist,H);
+    ctx.restore();
+  });
 
-  // World border glow
-  ctx.save();ctx.strokeStyle='rgba(35,166,213,0.2)';ctx.lineWidth=50;
-  ctx.strokeRect(-camX,-camY,WORLD,WORLD);ctx.restore();
-
-  // Decor
-  G.decorPts.forEach(d=>{
+  // Decor — fill only, no stroke anywhere
+  G.decor.forEach(d=>{
     const sx=d.x-camX,sy=d.y-camY;
-    if(sx<-60||sx>W+60||sy<-60||sy>H+60)return;
-    ctx.globalAlpha=.55;ctx.font=d.size+'px serif';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(d.emoji,sx,sy);ctx.globalAlpha=1;
+    if(sx<-80||sx>W+80||sy<-80||sy>H+80)return;
+    ctx.save();ctx.translate(sx,sy);ctx.scale(d.s,d.s);ctx.globalAlpha=.45;
+    if(d.type==='rock'){
+      ctx.fillStyle=`hsl(${210+d.seed*20|0},18%,${26+d.seed*12|0}%)`;
+      ctx.beginPath();ctx.ellipse(0,0,22,14,d.seed*.8,0,Math.PI*2);ctx.fill();
+      // small highlight on rock — fill only
+      ctx.globalAlpha=.12;
+      ctx.fillStyle='#fff';
+      ctx.beginPath();ctx.ellipse(-5,-4,8,4,-.4,0,Math.PI*2);ctx.fill();
+    } else if(d.type==='weed'){
+      // Draw weed as filled teardrop shapes stacked, NO stroke
+      const hue=140+d.seed*30|0;
+      const col=`hsl(${hue},55%,28%)`;
+      const col2=`hsl(${hue},55%,38%)`;
+      ctx.fillStyle=col;
+      ctx.beginPath();ctx.ellipse(2,-8,5,12,d.seed*.3-.15,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=col2;
+      ctx.beginPath();ctx.ellipse(-3,-18,4,9,d.seed*.3+.2,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=col;
+      ctx.beginPath();ctx.ellipse(5,-24,3,7,d.seed*.3-.3,0,Math.PI*2);ctx.fill();
+    }
+    // bubble cluster decor removed — was causing white oval artifacts
+    ctx.restore();
   });
 
   // Home cave
   drawHome(G.homeX-camX,G.homeY-camY);
 
   // NPCs
-  G.npcs.forEach(npc=>drawNPC(npc,camX,camY));
+  G.npcs.forEach(npc=>{
+    const sx=npc.x-camX,sy=npc.y-camY;
+    if(sx<-90||sx>W+90||sy<-90||sy>H+90)return;
+    if(G.quest&&G.questProg>=G.quest.qt.count&&G.quest.npc.id===npc.id) drawBadge(sx,sy-65,'!','#e74c3c');
+    else if(!G.quest&&!npc.questGiven&&QUEST_T.some(q=>q.giver===npc.id)) drawBadge(sx,sy-65,'?','#ffd700');
+    const bob=Math.sin(npc.wobble)*5;
+    ctx.save();ctx.shadowColor=npc.color;ctx.shadowBlur=18;
+    ctx.font='54px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(npc.emoji,sx,sy+bob);ctx.restore();
+    ctx.font='bold 14px Bubblegum Sans,cursive';
+    ctx.fillStyle='rgba(255,255,255,.85)';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(npc.name,sx,sy+bob+42);
+  });
 
-  // Collectibles
+  // Collectibles — stars bigger, pulsing ring, stronger glow
   G.items.forEach(it=>{
     if(it.collected)return;
     const sx=it.x-camX,sy=it.y-camY;
     if(sx<-60||sx>W+60||sy<-60||sy>H+60)return;
+    const def=COLLECT_DEF[it.id];
     const bob=Math.sin(it.wobble)*5;
     ctx.save();
-    ctx.shadowColor=it.glow;ctx.shadowBlur=16;
-    ctx.font=it.size+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(it.emoji,sx,sy+bob);
+    if(def.main){
+      // Stars: strong pulsing glow, bigger — no stroke (causes artifacts)
+      const pulse=18+Math.sin(it.wobble*2)*10;
+      ctx.shadowColor='rgba(255,215,0,1)';
+      ctx.shadowBlur=pulse;
+      ctx.font=(def.size+10)+'px serif';
+    } else {
+      ctx.shadowColor=def.glow;
+      ctx.shadowBlur=10;
+      ctx.font=def.size+'px serif';
+    }
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(def.emoji,sx,sy+bob);
     ctx.restore();
-  });
-
-  // Particles
-  G.particles.forEach(p=>{
-    const sx=p.x-camX,sy=p.y-camY;
-    ctx.save();ctx.globalAlpha=p.alpha;
-    ctx.font='18px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(p.emoji,sx,sy);ctx.restore();
   });
 
   // Bubbles
   G.bubbles.forEach(b=>{
     const sx=b.x-camX,sy=b.y-camY;
-    ctx.save();ctx.globalAlpha=Math.min(.55,b.life/60*.55);
+    if(sx<-20||sx>W+20||sy<-20||sy>H+20)return;
+    const alpha=Math.min(.38,b.life/70*.38);
+    ctx.save();ctx.globalAlpha=alpha;
     ctx.beginPath();ctx.arc(sx,sy,b.r,0,Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,0.28)';ctx.fill();
-    ctx.strokeStyle='rgba(255,255,255,0.45)';ctx.lineWidth=1;ctx.stroke();
+    ctx.fillStyle='rgba(180,220,255,.35)';ctx.fill();
+    // tiny highlight only — no stroke
+    ctx.globalAlpha=alpha*1.4;
+    ctx.beginPath();ctx.arc(sx-b.r*.3,sy-b.r*.3,b.r*.18,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,.6)';ctx.fill();
     ctx.restore();
   });
 
-  // Shield effect
+  // Power effects
   if(G.activePower==='p_shield'&&G.powerTimer>0){
-    ctx.save();
-    ctx.globalAlpha=.3+Math.sin(G.tick*.15)*.1;
-    ctx.strokeStyle='#7ee8ff';ctx.lineWidth=4;
-    ctx.shadowColor='#23a6d5';ctx.shadowBlur=20;
-    ctx.beginPath();ctx.arc(W/2,H/2,70,0,Math.PI*2);ctx.stroke();
+    ctx.save();ctx.globalAlpha=.25+Math.sin(G.tick*.14)*.1;ctx.strokeStyle='#7ee8ff';ctx.lineWidth=5;ctx.shadowColor='#23a6d5';ctx.shadowBlur=22;
+    ctx.beginPath();ctx.arc(W/2,H/2,78,0,Math.PI*2);ctx.stroke();
+    for(let i=0;i<8;i++){const a=i/8*Math.PI*2+G.tick*.03;ctx.beginPath();ctx.arc(W/2+Math.cos(a)*72,H/2+Math.sin(a)*72,5,0,Math.PI*2);ctx.fillStyle='rgba(126,232,255,.5)';ctx.fill();}
     ctx.restore();
   }
-
-  // Glow effect
   if(G.activePower==='p_glow'&&G.powerTimer>0){
-    ctx.save();
-    const alpha=0.18+Math.sin(G.tick*.2)*.06;
-    ctx.globalAlpha=alpha;
-    const rad=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,120);
-    rad.addColorStop(0,'#ffd700');rad.addColorStop(1,'transparent');
-    ctx.fillStyle=rad;ctx.fillRect(0,0,W,H);
+    ctx.save();ctx.globalAlpha=.12+Math.sin(G.tick*.18)*.05;
+    const rg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,130);rg.addColorStop(0,'#ffd700');rg.addColorStop(1,'transparent');
+    ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);ctx.restore();
+  }
+  if(G.activePower==='p_speed'&&G.powerTimer>0&&Math.sqrt(G.vx*G.vx+G.vy*G.vy)>1){
+    ctx.save();ctx.globalAlpha=.09;
+    for(let i=1;i<=4;i++){ctx.save();ctx.translate(W/2-Math.cos(G.angle)*i*14,H/2-Math.sin(G.angle)*i*14);ctx.rotate(G.angle);drawWhale(ctx,0,0,1,'#23a6d5','#7ee8ff');ctx.restore();}
     ctx.restore();
   }
 
   // WHALE
-  drawWhale(W/2,H/2);
+  let bc=G.bodyColor,be=G.bellyColor;
+  if(G.specialColor==='rainbow'){bc=getRainbow(G.rainbowT);be=getRainbow(G.rainbowT+1.5);}
+  if(G.specialColor==='galaxy'){bc=`hsl(${(G.tick*.9)%360},70%,30%)`;be=`hsl(${(G.tick*.9+60)%360},60%,60%)`;}
+  ctx.save();ctx.translate(W/2,H/2);ctx.rotate(G.angle);
+  drawWhale(ctx,0,0,1,bc,be);ctx.restore();
 
-  // Minimap
-  drawMinimap(camX,camY,W,H);
+  // Star burst toasts
+  G.starBursts.forEach(s=>{
+    const sx=s.wx-camX,sy=s.wy-camY;
+    const a=s.life/s.ml,rise=35*(1-a);
+    ctx.save();ctx.globalAlpha=a;
+    ctx.font=`bold ${s.big?30:22}px Bubblegum Sans,cursive`;
+    ctx.fillStyle='#ffd700';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.shadowColor='rgba(255,215,0,.7)';ctx.shadowBlur=10;
+    ctx.fillText(s.txt,sx,sy-rise);ctx.restore();
+  });
 
-  // NPC interact hint
-  if(G.nearNPC||G.nearHome){
+  // Interaction prompt — large pill
+  if(G.nearNPC&&!G.dlgOpen){
+    const label=isTouchDevice()?'Tap to talk to '+G.nearNPC.name+'!':'E = Talk to '+G.nearNPC.name+'!';
     ctx.save();
-    const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
-    const label=G.nearHome
-      ?(isTouch?'Tap anywhere to enter your cave!':'[E] Enter Your Cave')
-      :(isTouch?'Tap anywhere to talk!':'[E] Talk to '+G.nearNPC.name);
-    // Background pill
     ctx.font='bold 22px Bubblegum Sans,cursive';
     const tw=ctx.measureText(label).width;
-    ctx.fillStyle=G.nearHome?'rgba(255,215,0,0.18)':'rgba(35,166,213,0.18)';
-    ctx.beginPath();
-    ctx.roundRect(W/2-tw/2-16,H/2-128,tw+32,42,21);
-    ctx.fill();
-    ctx.fillStyle='#fff';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.shadowColor=G.nearHome?'#ffd700':'#23a6d5';ctx.shadowBlur=14;
-    ctx.fillText(label,W/2,H/2-107);
+    const pw=tw+36,ph=48,px=W/2-pw/2,py=H/2-132;
+    ctx.fillStyle='rgba(2,18,44,.88)';ctx.strokeStyle='rgba(255,215,0,.8)';ctx.lineWidth=2.5;
+    rrect(ctx,px,py,pw,ph,24);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.shadowColor='#ffd700';ctx.shadowBlur=10;ctx.fillText(label,W/2,py+ph/2);
     ctx.restore();
   }
 
-  // Nearest arrow
-  drawNearestArrow(camX,camY,W,H);
+  drawMinimap(camX,camY,W,H);
+  drawArrow(camX,camY,W,H);
 }
 
-// ─── HOME CAVE ───
 function drawHome(sx,sy){
-  ctx.save();
-  // cave glow
-  const grd=ctx.createRadialGradient(sx,sy,0,sx,sy,90);
-  grd.addColorStop(0,'rgba(255,215,0,0.18)');grd.addColorStop(1,'transparent');
-  ctx.fillStyle=grd;ctx.fillRect(sx-90,sy-90,180,180);
-  // cave emoji
-  ctx.font='60px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.shadowColor='rgba(255,215,0,0.6)';ctx.shadowBlur=20;
-  const bob=Math.sin(G.tick*.04)*3;
-  ctx.fillText('🏠',sx,sy+bob);
-  // label
-  ctx.font='13px Bubblegum Sans,cursive';
-  ctx.fillStyle='#ffd700';ctx.shadowBlur=8;
-  ctx.fillText('Your Cave!',sx,sy+40);
+  const rg=ctx.createRadialGradient(sx,sy,0,sx,sy,80);
+  rg.addColorStop(0,'rgba(255,215,0,.22)');rg.addColorStop(1,'transparent');
+  ctx.fillStyle=rg;ctx.fillRect(sx-80,sy-80,160,160);
+  ctx.fillStyle='#2c3e50';ctx.beginPath();ctx.arc(sx,sy+8,46,Math.PI,0);ctx.lineTo(sx+46,sy+36);ctx.lineTo(sx-46,sy+36);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#34495e';ctx.beginPath();ctx.arc(sx,sy+8,38,Math.PI,0);ctx.closePath();ctx.fill();
+  const ig=ctx.createRadialGradient(sx,sy+8,0,sx,sy+8,34);ig.addColorStop(0,'rgba(255,160,40,.3)');ig.addColorStop(1,'rgba(10,30,60,.8)');
+  ctx.fillStyle=ig;ctx.beginPath();ctx.arc(sx,sy+8,34,Math.PI,0);ctx.closePath();ctx.fill();
+  const cols=['#e74c3c','#f39c12','#2ecc71','#23a6d5','#9b59b6'];
+  cols.forEach((col,i)=>{const gx=sx-28+i*14,gy=sy+6;ctx.save();ctx.globalAlpha=.6+Math.sin(G.tick*.08+i)*.35;ctx.beginPath();ctx.arc(gx,gy,3.5,0,Math.PI*2);ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=8;ctx.fill();ctx.restore();});
+  ctx.font='bold 15px Bubblegum Sans,cursive';ctx.fillStyle='rgba(255,215,0,.9)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(255,215,0,.5)';ctx.shadowBlur=8;ctx.fillText('Your Cave!',sx,sy+52);ctx.shadowBlur=0;
+}
+
+function drawBadge(sx,sy,txt,color){
+  ctx.save();ctx.translate(sx,sy+Math.sin(G.tick*.1)*5);
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(0,0,17,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font='bold 20px Fredoka One,sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,0,1);
   ctx.restore();
 }
 
-// ─── NPC ───
-function drawNPC(npc,camX,camY){
-  const sx=npc.x-camX,sy=npc.y-camY;
-  const W=canvas.width,H=canvas.height;
-  if(sx<-80||sx>W+80||sy<-80||sy>H+80)return;
-  ctx.save();
-  // glow ring
-  ctx.beginPath();ctx.arc(sx,sy,38,0,Math.PI*2);
-  ctx.fillStyle='rgba(35,166,213,0.12)';ctx.fill();
-  ctx.strokeStyle=npc.color+'88';ctx.lineWidth=2;ctx.stroke();
-  // quest indicator
-  if(G.quest&&G.questProgress>=G.quest.qt.count&&G.quest.npc.id===npc.id){
-    ctx.font='20px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText('❗',sx,sy-48+Math.sin(G.tick*.12)*4);
-  } else if(!G.quest&&!npc.questGiven&&QUEST_TEMPLATES.some(q=>q.giver===npc.id)){
-    ctx.font='18px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillStyle='#ffd700';ctx.fillText('💬',sx,sy-48+Math.sin(G.tick*.1)*4);
-  }
-  const bob=Math.sin(npc.wobble)*6;
-  ctx.font='44px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.shadowColor=npc.color;ctx.shadowBlur=16;
-  ctx.fillText(npc.emoji,sx,sy+bob);
-  // name label
-  ctx.font='12px Bubblegum Sans,cursive';
-  ctx.fillStyle='rgba(255,255,255,0.8)';ctx.shadowBlur=8;
-  ctx.fillText(npc.name,sx,sy+34);
-  ctx.restore();
-}
-
-// ─── WHALE ───
-function darken(hex){
-  if(!hex||hex==='transparent')return '#333';
-  try{let r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
-    return`rgb(${Math.floor(r*.6)},${Math.floor(g*.6)},${Math.floor(b*.6)})`;}catch{return'#333';}
-}
-
-function getRainbowColor(t){
-  const r=Math.sin(t)*127+128,g=Math.sin(t+2.094)*127+128,b=Math.sin(t+4.189)*127+128;
-  return`rgb(${Math.floor(r)},${Math.floor(g)},${Math.floor(b)})`;
-}
-
-function drawWhale(cx,cy){
-  const sp=Math.sqrt(G.vx*G.vx+G.vy*G.vy);
-  const wag=Math.sin(G.tick*.18)*.2*(sp>.4?1:0);
-  let bc=G.bodyColor,be=G.bellyColor;
-  if(G.specialColor==='rainbow'){bc=getRainbowColor(G.colorRainbowT);be=getRainbowColor(G.colorRainbowT+1.5);}
-  if(G.specialColor==='galaxy'){bc=`hsl(${(G.tick*1.2)%360},70%,30%)`;be=`hsl(${(G.tick*1.2+60)%360},60%,60%)`;}
-  const fin=darken(G.bodyColor);
-
-  ctx.save();
-  ctx.translate(cx,cy);
-  ctx.rotate(G.angle);
-
-  // Glow power aura
-  if(G.activePower==='p_glow'&&G.powerTimer>0){
-    ctx.save();ctx.shadowColor='#ffd700';ctx.shadowBlur=30+Math.sin(G.tick*.3)*10;
-    ctx.globalAlpha=.4;ctx.beginPath();ctx.ellipse(18,0,90,48,0,0,Math.PI*2);
-    ctx.fillStyle='#ffd700';ctx.fill();ctx.restore();
-  }
-  // Speed trail
-  if(G.activePower==='p_speed'&&G.powerTimer>0&&sp>1){
-    ctx.save();ctx.globalAlpha=.18;
-    for(let i=1;i<=4;i++){
-      ctx.beginPath();ctx.ellipse(18-i*14,0,90,46,0,0,Math.PI*2);
-      ctx.fillStyle='#23a6d5';ctx.fill();
-    }
-    ctx.restore();
-  }
-
-  ctx.save();ctx.shadowColor='rgba(0,0,0,0.25)';ctx.shadowBlur=18;ctx.shadowOffsetY=6;
-
-  // Tail
-  ctx.save();ctx.translate(-70,0);ctx.rotate(wag);
-  ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(-32,-36,-16,-56);ctx.quadraticCurveTo(-5,-24,10,-4);
-  ctx.closePath();ctx.fillStyle=bc;ctx.fill();
-  ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(-32,36,-16,56);ctx.quadraticCurveTo(-5,24,10,4);
-  ctx.closePath();ctx.fillStyle=bc;ctx.fill();
-  ctx.restore();
-
-  // Flipper
-  ctx.beginPath();ctx.moveTo(0,18);ctx.quadraticCurveTo(-26,52,-4,53);ctx.quadraticCurveTo(12,40,13,18);
-  ctx.closePath();ctx.fillStyle=fin;ctx.fill();
-
-  // Body
-  ctx.beginPath();ctx.ellipse(18,0,80,43,0,0,Math.PI*2);ctx.fillStyle=bc;ctx.fill();
-  // Belly
-  ctx.beginPath();ctx.ellipse(26,16,57,23,0,0,Math.PI*2);ctx.fillStyle=be;ctx.fill();
-
-  // Spots
-  const sc=G.bodyColor; // reuse darken for spots if spot color set via shop
-  // (spots handled via equippedAccs below)
-
-  // Dorsal fin
-  ctx.beginPath();ctx.moveTo(18,-44);ctx.quadraticCurveTo(44,-12,56,-5);ctx.quadraticCurveTo(38,-8,15,-8);
-  ctx.closePath();ctx.fillStyle=fin;ctx.fill();
-
-  ctx.restore();// shadow off
-
-  // Eye
-  ctx.beginPath();ctx.arc(73,-9,9,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
-  ctx.beginPath();ctx.arc(75,-9,5,0,Math.PI*2);ctx.fillStyle='#1a1a2e';ctx.fill();
-  ctx.beginPath();ctx.arc(77,-11,1.8,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
-  // Smile
-  ctx.beginPath();ctx.arc(67,4,11,.1,Math.PI*.85);ctx.strokeStyle='rgba(10,58,106,.6)';ctx.lineWidth=2.5;ctx.stroke();
-  // Blowhole
-  ctx.beginPath();ctx.ellipse(79,-33,6,3,0,0,Math.PI*2);ctx.fillStyle=fin;ctx.fill();
-
-  // Narwhal horn
-  if(WHALE_TYPES[G.whaleType].horn){
-    ctx.beginPath();ctx.moveTo(83,-30);ctx.lineTo(122,10);
-    ctx.strokeStyle='#d4af37';ctx.lineWidth=5;ctx.lineCap='round';ctx.stroke();
-  }
-
-  // Accessories
-  const accPos={
-    a_crown:[68,-55],a_hat:[67,-56],a_bow:[68,-46],a_glasses:[58,-9],
-    a_flower:[77,-46],a_star:[54,-44],a_rainbow:[40,-54],a_halo:[68,-60],
-    a_party:[64,-54],a_magic:[40,-50],
-  };
-  ctx.font='24px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-  SHOP_ITEMS.accessories.forEach(a=>{
-    if(!G.equippedAccs.has(a.id))return;
-    const [ax,ay]=accPos[a.id]||[60,-46];
-    ctx.fillText(a.emoji,ax,ay);
-  });
-
-  ctx.restore();
-}
-
-// ─── MINIMAP ───
 function drawMinimap(camX,camY,W,H){
-  const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
-  const mw=130,mh=130;
-  const mx=W-mw-12;
-  const my=isTouch ? H-mh-180 : H-mh-12; // shift up on touch so it clears the action buttons
-  const scale=mw/WORLD;
-  ctx.save();ctx.globalAlpha=.88;
-  ctx.fillStyle='rgba(2,18,44,0.8)';
-  ctx.strokeStyle='rgba(35,166,213,0.5)';ctx.lineWidth=2;
-  roundRect(ctx,mx,my,mw,mh,10);ctx.fill();ctx.stroke();
-  // items
-  ctx.globalAlpha=.5;
+  const mw=130,mh=130,mx=W-mw-10,my=H-mh-10,sc=mw/WORLD;
+  ctx.save();ctx.globalAlpha=.9;ctx.fillStyle='rgba(2,18,44,.84)';ctx.strokeStyle='rgba(35,166,213,.5)';ctx.lineWidth=2;
+  rrect(ctx,mx,my,mw,mh,10);ctx.fill();ctx.stroke();
+  ctx.globalAlpha=.55;
   G.items.forEach(it=>{
     if(it.collected)return;
-    ctx.fillStyle='#ffd700';ctx.beginPath();
-    ctx.arc(mx+it.x*scale,my+it.y*scale,1.5,0,Math.PI*2);ctx.fill();
+    const def=COLLECT_DEF[it.id];
+    ctx.fillStyle=def.main?'#ffd700':'rgba(255,255,255,.4)';
+    ctx.beginPath();ctx.arc(mx+it.x*sc,my+it.y*sc,def.main?2.8:1.2,0,Math.PI*2);ctx.fill();
   });
-  // NPCs
-  ctx.globalAlpha=.8;
-  G.npcs.forEach(npc=>{
-    ctx.fillStyle=npc.color;ctx.beginPath();
-    ctx.arc(mx+npc.x*scale,my+npc.y*scale,3,0,Math.PI*2);ctx.fill();
-  });
-  // home
-  ctx.fillStyle='#ffd700';ctx.font='10px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText('🏠',mx+G.homeX*scale,my+G.homeY*scale);
-  // whale
-  ctx.globalAlpha=1;ctx.fillStyle='#7ee8ff';ctx.beginPath();
-  ctx.arc(mx+G.x*scale,my+G.y*scale,5,0,Math.PI*2);ctx.fill();
-  // viewport
-  ctx.strokeStyle='rgba(255,255,255,0.25)';ctx.lineWidth=1;
-  ctx.strokeRect(mx+camX*scale,my+camY*scale,W*scale,H*scale);
+  ctx.globalAlpha=.85;
+  G.npcs.forEach(npc=>{ctx.fillStyle=npc.color;ctx.beginPath();ctx.arc(mx+npc.x*sc,my+npc.y*sc,3.5,0,Math.PI*2);ctx.fill();});
+  ctx.globalAlpha=1;ctx.fillStyle='#ffd700';ctx.strokeStyle='#fff';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(mx+G.homeX*sc,my+G.homeY*sc,5,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#7ee8ff';ctx.beginPath();ctx.arc(mx+G.x*sc,my+G.y*sc,5.5,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,.18)';ctx.lineWidth=1;ctx.strokeRect(mx+camX*sc,my+camY*sc,W*sc,H*sc);
   ctx.restore();
 }
 
-function roundRect(c,x,y,w,h,r){
-  c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);
-  c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
-  c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);
-  c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();
-}
-
-// ─── NEAREST ARROW ───
-function drawNearestArrow(camX,camY,W,H){
+function drawArrow(camX,camY,W,H){
   let nearest=null,nd=Infinity;
-  // Quest target first
-  if(G.quest&&G.questProgress<G.quest.qt.count){
-    G.items.forEach(it=>{
-      if(it.collected||it.id!==G.quest.qt.target)return;
-      const dx=it.x-G.x,dy=it.y-G.y,d=dx*dx+dy*dy;
-      if(d<nd){nd=d;nearest=it;}
-    });
+  if(G.quest&&G.questProg<G.quest.qt.count){
+    G.items.forEach(it=>{if(it.collected||it.id!==G.quest.qt.target)return;const d=(it.x-G.x)**2+(it.y-G.y)**2;if(d<nd){nd=d;nearest=it;}});
   }
-  if(!nearest){
-    G.items.forEach(it=>{
-      if(it.collected)return;
-      const dx=it.x-G.x,dy=it.y-G.y,d=dx*dx+dy*dy;
-      if(d<nd){nd=d;nearest=it;}
-    });
-  }
-  if(!nearest||nd<200*200)return;
+  if(!nearest)G.items.forEach(it=>{if(it.collected)return;const d=(it.x-G.x)**2+(it.y-G.y)**2;if(d<nd){nd=d;nearest=it;}});
+  if(!nearest||nd<180*180)return;
   const sx=nearest.x-camX,sy=nearest.y-camY;
   if(sx>0&&sx<W&&sy>0&&sy<H)return;
   const a=Math.atan2(nearest.y-G.y,nearest.x-G.x);
-  const ex=W/2+Math.cos(a)*(W/2-34),ey=H/2+Math.sin(a)*(H/2-64);
-  ctx.save();ctx.translate(ex,ey);ctx.rotate(a);
-  ctx.fillStyle='rgba(255,215,0,.85)';
-  ctx.beginPath();ctx.moveTo(18,0);ctx.lineTo(-10,-8);ctx.lineTo(-10,8);ctx.closePath();ctx.fill();
-  ctx.restore();
-  ctx.font='18px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText(nearest.emoji,ex,ey);
+  const ex=W/2+Math.cos(a)*(W/2-40),ey=H/2+Math.sin(a)*(H/2-74);
+  ctx.save();ctx.translate(ex,ey);ctx.rotate(a);ctx.fillStyle='rgba(255,215,0,.9)';ctx.beginPath();ctx.moveTo(24,0);ctx.lineTo(-10,-9);ctx.lineTo(-10,9);ctx.closePath();ctx.fill();ctx.restore();
+  const def=COLLECT_DEF[nearest.id];
+  ctx.font='18px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(def.emoji,ex,ey);
 }
 
-// ════════════════════════════════════════════════════
-//  TOUCH CONTROLS
-// ════════════════════════════════════════════════════
-//  DRAG-TO-SWIM TOUCH CONTROLS
-// ════════════════════════════════════════════════════
-// The whale swims toward where the player drags.
-// Speed is consistent — only direction comes from drag.
-// A short drag = slow, long drag = full speed (capped).
-const drag={active:false,id:null,startX:0,startY:0,dx:0,dy:0};
-const DRAG_FULL=60; // pixels of drag for full speed
+function rrect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();}
 
-function initTouchControls(){
-  const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
-  if(!isTouch)return;
-  document.getElementById('touch-controls').style.display='block';
-  document.getElementById('hud-hint').style.display='none';
-  document.getElementById('power-bar').style.display='none';
-
-  const ripple=document.getElementById('drag-ripple');
-  const tc=document.getElementById('touch-controls');
-
-  // Listen on the whole screen for drag (but not on UI buttons)
-  tc.style.pointerEvents='none'; // let events fall through to canvas
-  canvas.addEventListener('touchstart',e=>{
-    if(G.dlgOpen||document.getElementById('cave-screen').style.display!=='none') return;
-    e.preventDefault();
-    const t=e.changedTouches[0];
-    drag.active=true; drag.id=t.identifier;
-    drag.startX=t.clientX; drag.startY=t.clientY;
-    drag.dx=0; drag.dy=0;
-    // show ripple at touch point
-    ripple.style.left=t.clientX+'px';
-    ripple.style.top=t.clientY+'px';
-    ripple.style.display='block';
-    ripple.style.opacity='1';
-  },{passive:false});
-
-  canvas.addEventListener('touchmove',e=>{
-    e.preventDefault();
-    for(const t of e.changedTouches){
-      if(t.identifier!==drag.id)continue;
-      drag.dx=t.clientX-drag.startX;
-      drag.dy=t.clientY-drag.startY;
-      // move ripple with finger
-      ripple.style.left=t.clientX+'px';
-      ripple.style.top=t.clientY+'px';
-    }
-  },{passive:false});
-
-  function endDrag(e){
-    for(const t of e.changedTouches){
-      if(t.identifier===drag.id){
-        // On quick tap (tiny drag) near NPC or home — interact
-        const mag=Math.sqrt(drag.dx*drag.dx+drag.dy*drag.dy);
-        if(mag<12){
-          if(G.nearNPC) talkToNPC(G.nearNPC);
-          else if(G.nearHome) showCave();
-        }
-        drag.active=false; drag.dx=0; drag.dy=0;
-        ripple.style.opacity='0';
-        setTimeout(()=>{ ripple.style.display='none'; },150);
-      }
-    }
-  }
-  canvas.addEventListener('touchend',endDrag,{passive:false});
-  canvas.addEventListener('touchcancel',endDrag,{passive:false});
-}
-
-// Called each frame — applies drag direction as consistent velocity
-function applyTouchInput(){
-  if(!drag.active)return;
-  const mag=Math.sqrt(drag.dx*drag.dx+drag.dy*drag.dy);
-  if(mag<8)return; // dead zone — tiny wobbles do nothing
-  // Scale 0→1 over first DRAG_FULL pixels, then clamp at 1
-  const scale=Math.min(1, mag/DRAG_FULL);
-  const nx=drag.dx/mag;
-  const ny=drag.dy/mag;
-  G.vx+=nx*SPEED*scale*1.2;
-  G.vy+=ny*SPEED*scale*1.2;
-}
-
-function touchCaveBtn(){
-  if(G.nearHome) showCave();
-  else showFact({e:'🏠',t:'Swim back to your Cave first! Look for the house on the map!',title:'Not near home!'});
-}
-
-function buildTouchPowers(){
-  const container=document.getElementById('touch-powers');
-  container.innerHTML='';
-  const powers=SHOP_ITEMS.powers.filter(p=>G.ownedPowers[p.id]);
-  powers.forEach(p=>{
-    const btn=document.createElement('button');
-    btn.className='touch-power-btn'+(G.activePower===p.id&&G.powerTimer>0?' active':'');
-    btn.textContent=p.emoji;
-    btn.addEventListener('touchstart',(e)=>{e.preventDefault();usePower(p.key);},{passive:false});
-    btn.onclick=()=>usePower(p.key);
-    container.appendChild(btn);
-  });
-}
-
-// ════════════════════════════════════════════════════
-//  HOME SCREEN BUBBLES ANIMATION
-// ════════════════════════════════════════════════════
-const hc=document.getElementById('home-canvas');
-const hctx=hc.getContext('2d');
-const hBubbles=[];
-function initHomeBubbles(){
-  hc.width=window.innerWidth;hc.height=window.innerHeight;
-  for(let i=0;i<30;i++) hBubbles.push({
-    x:Math.random()*hc.width,y:Math.random()*hc.height,
-    r:6+Math.random()*20,speed:.4+Math.random()*.8,t:Math.random()*100});
-}
-function animHomeBubbles(){
-  if(!document.getElementById('home-screen').style.display||
-    document.getElementById('home-screen').style.display!=='none'){
-    hctx.clearRect(0,0,hc.width,hc.height);
-    hBubbles.forEach(b=>{
-      b.y-=b.speed;b.x+=Math.sin(b.t*.07)*.8;b.t++;
-      if(b.y<-40){b.y=hc.height+20;b.x=Math.random()*hc.width;}
-      hctx.save();hctx.globalAlpha=.25;
-      hctx.beginPath();hctx.arc(b.x,b.y,b.r,0,Math.PI*2);
-      hctx.fillStyle='rgba(255,255,255,0.3)';hctx.fill();
-      hctx.strokeStyle='rgba(255,255,255,0.5)';hctx.lineWidth=1;hctx.stroke();
-      hctx.restore();
-    });
-    requestAnimationFrame(animHomeBubbles);
-  }
-}
-initHomeBubbles();animHomeBubbles();
-
-// ════════════════════════════════════════════════════
-//  MAIN GAME LOOP
-// ════════════════════════════════════════════════════
-function loop(){
-  update();
-  draw();
-  requestAnimationFrame(loop);
-}
+// ════════════════ LOOP ════════════════
+function loop(){update();draw();requestAnimationFrame(loop);}
 </script>
 </body>
 </html>
